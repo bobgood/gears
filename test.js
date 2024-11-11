@@ -39,19 +39,16 @@ function extrudeAndAddToScene(outline, inline, teeth, extrusionDepth, offsetX = 
 let outline, inline, teeth;
 // Test function to generate the gear shape
 function test() {
-     outline = [];
-     inline = [];
-     teeth = [];
     const numTeeth = 4;
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
     const gear = new Gear(module, numTeeth, pressureAngle);
     const extrusionDepth = 2;
-    extrudedMesh1 = extrudeAndAddToScene(gear.outline, gear.inline, gear.teeth, extrusionDepth,0, 0x0077ff);
+    extrudedMesh1 = extrudeAndAddToScene(gear.Outline, gear.Inline, gear.Teeth, extrusionDepth,0, 0x0077ff);
 
     // Extrude and add the second gear, offset to the right by the pitchRadius * 2
-    extrudedMesh2 = extrudeAndAddToScene(gear.outline, gear.inline, gear.teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
+    extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.Inline, gear.Teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
 }
 
 function see(outline, col) {
