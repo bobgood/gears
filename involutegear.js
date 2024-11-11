@@ -1,47 +1,80 @@
+class Gear {
+    constructor(module, numTeeth, pressureAngle) {
+		console.log(module, numTeeth, pressureAngle);
+        this.module = module;
+        this.numTeeth = numTeeth;
+        this.pressureAngle = pressureAngle;
+        this.outline = [];
+        this.inline = [];
+        this.teeth = [];
+        this.scene = new THREE.Scene();
 
-var gears = {
 
-	dupliate_points: function( pnts ){
-		var ret = [];
-		for( var i=0; i<pnts.length; i++ ){
-			ret[i] = [ pnts[i][0], pnts[i][1] ];
-		}
-		return ret;
-	},
 
-	point_radius: function( pnt ){
-		return Math.sqrt( pnt[0]*pnt[0] + pnt[1]*pnt[1] );
-	},
+		this.Rp = this.pitch_diameter()/2.0;
 
-	lerp: function( val, v0, p0, v1, p1 ){
+		// Rb aka r base
+		this.Rb = this.base_diameter()/2.0;
+
+		// Rd aka r dedendum aka r min
+		this.Rd = this.Rp - this.dedendum();
+
+		// Ra aka r addendum aka r max
+		this.Ra = this.Rp + this.addendum();
+		console.log(this.Ra, this.Rb, this.Rd, this.Rp);
+		// thickness of the tooth
+		this.t  = this.tooth_thickness();
+
+		// smoothing points along the involute curve
+		this.N = 20;
+
+		this.generate();
+    }
+
+	point_radius( pnt ){
+		return Math.sqrt( pnt.x*pnt.x + pnt.y*pnt.y );
+	}
+
+	lerp( val, v0, p0, v1, p1 ){
 		var w = (val - v0)/(v1-v0);
-		return [p1[0]*w+p0[0]*(1.0-w), p1[1]*w+p0[1]*(1.0-w)];
-	},
+		return {
+			x:p1.x*w+p0.x*(1.0-w), 
+			y:p1.y*w+p0.y*(1.0-w)
+		};
+	}
 
-	rotate_point: function( cen, pnt, theta ){
-		var tpnt = [ pnt[0]-cen[0], pnt[1]-cen[1] ];
-		var rpnt = [ Math.cos(theta)*tpnt[0] + Math.sin(theta)*tpnt[1], -Math.sin(theta)*tpnt[0]+Math.cos(theta)*tpnt[1] ];
-		return [ rpnt[0]+cen[0], rpnt[1]+cen[1] ];
-	},
+	rotate_point( cen, pnt, theta ){
+		var tpnt = {
+			x: pnt.x-cen.x, 
+			y:pnt.y-cen.y 
+		};
+		var rpnt = {
+			x:Math.cos(theta)*tpnt.x + Math.sin(theta)*tpnt.y, 
+			y:-Math.sin(theta)*tpnt.x+Math.cos(theta)*tpnt.y };
+		return {x: rpnt.x+cen.x, y: rpnt.y+cen.y };
+	}
 
-	involute_point: function( r, theta ){
-		return [ r*(Math.cos(theta)+theta*Math.sin(theta)), -r*(Math.sin(theta)-theta*Math.cos(theta)) ]; 
-	},
+	involute_point(theta) {
+		return {
+			x: this.Rb * (Math.cos(theta) + theta * Math.sin(theta)),
+			y: -this.Rb * (Math.sin(theta) - theta * Math.cos(theta))
+		};
+	}
 
-	involute_bisect: function( r_base, r_target ){
+	involute_bisect(  r_target ){
 		var theta_lo = 0.0;
-		var r_lo = this.point_radius( this.involute_point( r_base, theta_lo ) );
+		var r_lo = this.point_radius( this.involute_point(theta_lo ) );
 		var theta_hi = Math.PI;
-		var r_hi = this.point_radius( this.involute_point( r_base, theta_hi ) );
+		var r_hi = this.point_radius( this.involute_point(theta_hi ) );
 		// check if the target is achievable
-		if( r_hi < r_target ) 
+		if( this.Ra < r_target ) 
 			return -1.0;
 
 		var theta_mi = (theta_lo+theta_hi)/2.0;
 		var r_mi;
-		for( i=0; i<20; i++ ){
+		for(let i=0; i<20; i++ ){
 			theta_mi = (theta_lo+theta_hi)/2.0;
-			r_mi = this.point_radius( this.involute_point( r_base, theta_mi ) );
+			r_mi = this.point_radius( this.involute_point(theta_mi ) );
 			if( r_mi <= r_target ){
 				r_lo     = r_mi;
 				theta_lo = theta_mi;
@@ -51,92 +84,84 @@ var gears = {
 			}
 		}
 		return theta_mi;
-	},
+	}
 
-	involute_curve: function( r_base, theta_max, r_min, r_max, N ){
+	involute_curve(  ){
 		var theta_lo = 0.0;
-		var theta_hi = this.involute_bisect( r_base, r_max );
+		var theta_hi = this.involute_bisect(  this.Ra );
 		var curve = [];
-		var cnt=0;
-		if( r_min < r_base ){
-			curve[cnt++] = [ r_min, 0 ];
+		if( this.Rd < this.Rb ){
+			curve.push( {x: this.Rd, y:0 });
 		}
-		var dtheta = (theta_hi-theta_lo)/(N-1);
-		for( var i=0; i<N; i++ ){
-			curve[cnt++] = this.involute_point( r_base, i*dtheta+theta_lo );
+		var dtheta = (theta_hi-theta_lo)/(this.N-1);
+		for( var i=0; i<this.N; i++ ){
+			curve.push( this.involute_point( i*dtheta+theta_lo ));
 		}
 		return curve;
-	},
+	}
 
-	pitch_diameter: function( module, pressure_angle, num_teeth ){
-		return module*num_teeth;
-	},
+	pitch_diameter( ){
+		console.log(this.module, this.numTeeth, this.pressureAngle);
+		return this.module*this.numTeeth;
+	}
 
-	base_diameter: function( module, pressure_angle, num_teeth ){
-		return this.pitch_diameter(module,pressure_angle,num_teeth)*Math.cos(pressure_angle);
-	},
+	base_diameter( ){
+		return this.pitch_diameter()*Math.cos(this.pressureAngle);
+	}
 
-	dedendum: function( module, pressure_angle, num_teeth ){
-		return 1.2*module;
-	},
+	dedendum(){
+		return 1.2*this.module;
+	}
+	
+	addendum(  ){
+		return 1.0*this.module;
+	}
 
-	addendum: function( module, pressure_angle, num_teeth ){
-		return 1.0*module;
-	},
+	tooth_thickness(  ){
+		return Math.PI*this.pitch_diameter()/(2.0*this.numTeeth);
+	}
 
-	tooth_thickness: function( module, pressure_angle, num_teeth ){
-		return Math.PI*this.pitch_diameter(module,pressure_angle,num_teeth)/(2.0*num_teeth);
-	},
-
-	generate: function(outline, inline, teeth, module, pressure_angle, num_teeth ){
-		var Rp = this.pitch_diameter(module,pressure_angle,num_teeth)/2.0;
-		var Rb = this.base_diameter(module,pressure_angle,num_teeth)/2.0;
-		var Rd = Rp - this.dedendum(module,pressure_angle,num_teeth);
-		var Ra = Rp + this.addendum(module,pressure_angle,num_teeth);
-		var t  = this.tooth_thickness(module,pressure_angle,num_teeth);
-
-
+	generate(){
 		// find the crossing point of the involute curve with the pitch circle
-		var p_cross = this.involute_point( Rb, this.involute_bisect( Rb, Rp ) );
-		var theta_cross = Math.atan2( p_cross[1], p_cross[0] );
-		var dtheta = t/Rp;
+		var p_cross = this.involute_point(  this.involute_bisect( this.Rp ) );
+		var theta_cross = Math.atan2( p_cross.y, p_cross.x );
+		var dtheta = this.t/this.Rp;
+		console.log(dtheta);
+	
 
 		// compute whether the gear profile will self-intersect once patterned
-    	var tmp = this.involute_curve( Rb, Math.PI/2, Rd, Ra, 20 );
-		console.log("tmp: ", tmp.map(point => `${point[0]}, ${point[1]}`).join('\n'));
-		var cnt = 0;
+    	var tmp = this.involute_curve();
     	var involute = [];
+		let pt;
     	for( var i=0; i<tmp.length; i++ ){
-    		tpnt = this.rotate_point( [0,0], tmp[i], +theta_cross-dtheta/2 );
-    		angle1 = Math.atan2( tpnt[1], tpnt[0] );
-    		if( angle1 < Math.PI/num_teeth && tpnt[1] > 0 ){
-    			involute[cnt++] = [ tmp[i][0], tmp[i][1] ];
+    		var tpnt = this.rotate_point( {x:0,y:0}, tmp[i], +theta_cross-dtheta/2 );
+    		var angle1 = Math.atan2( tpnt.y, tpnt.x );
+    		if( angle1 < Math.PI/this.numTeeth && tpnt.y > 0 ){
+    			involute.push(tmp[i]);
     		}
     	}
 
 
-    	for( var i=0; i<num_teeth; i++ ){
-      		var theta = i*Math.PI*2.0/(num_teeth)+theta_cross-dtheta/2;
-      		var theta2 = i*Math.PI*2.0/(num_teeth)-theta_cross+dtheta/2;
+
+    	for( var i=0; i<this.numTeeth; i++ ){
+      		var theta = i*Math.PI*2.0/(this.numTeeth)+theta_cross-dtheta/2;
+      		var theta2 = i*Math.PI*2.0/(this.numTeeth)-theta_cross+dtheta/2;
 			var tooth=[];
-			var ptx;
 
       		for( var j=0; j<involute.length; j++ ){
-      			pt = this.rotate_point( [0,0], [ involute[j][0], involute[j][1] ], theta );
-				ptx = { x: pt[0], y: pt[1]}
-				outline.push(ptx);
-				tooth.push(ptx);
-				if (j==0) inline.push(ptx);
+      			pt = this.rotate_point( {x:0,y:0}, {x:involute[j].x, y:involute[j].y }, theta );
+				this.outline.push(pt);
+				tooth.push(pt);
+				if (j==0) this.inline.push(pt);
       		}
       		for( var j=involute.length-1; j>=0; j-- ){
-      			pt = this.rotate_point( [0,0], [ involute[j][0], -involute[j][1] ], theta2 );
-				ptx = { x: pt[0], y: pt[1]}
-				outline.push(ptx);
-				tooth.push(ptx);
+      			pt = this.rotate_point( {x:0,y:0}, {x: involute[j].x, y:-involute[j].y }, theta2 );
+				this.outline.push(pt);
+				tooth.push(pt);
+				if (j==0) this.inline.push(pt);
       		}
 
-			inline.push(ptx);
-			teeth.push(tooth);
+			this.teeth.push(tooth);
     	}
 	}
 };

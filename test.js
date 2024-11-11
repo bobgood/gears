@@ -42,22 +42,16 @@ function test() {
      outline = [];
      inline = [];
      teeth = [];
-    const addendum = 2; // Large addendum to make the tooth stand out
-    const dedendum = 1; // Large dedendum to make the root obvious
-    const toothCount = 4;
-    const segments = Math.max(2, 180/toothCount);
-    const tipFrac = 0.4;
+    const numTeeth = 4;
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
-    // Populate the outline, inline, and teeth arrays with the gear shape
-    // gear(outline, inline, teeth, pitchRadius - dedendum, pitchRadius + dedendum, toothCount, tipFrac, pressureAngle, segments);
-    gears.generate(outline, inline, teeth, module, pressureAngle, toothCount);
+    const gear = new Gear(module, numTeeth, pressureAngle);
     const extrusionDepth = 2;
-    extrudedMesh1 = extrudeAndAddToScene(outline, inline, teeth, extrusionDepth,0, 0x0077ff);
+    extrudedMesh1 = extrudeAndAddToScene(gear.outline, gear.inline, gear.teeth, extrusionDepth,0, 0x0077ff);
 
     // Extrude and add the second gear, offset to the right by the pitchRadius * 2
-    extrudedMesh2 = extrudeAndAddToScene(outline, inline, teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
+    extrudedMesh2 = extrudeAndAddToScene(gear.outline, gear.inline, gear.teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
 }
 
 function see(outline, col) {
