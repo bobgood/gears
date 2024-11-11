@@ -1,9 +1,4 @@
 
-/*
-	gears.js
-	James Gregson (2015)
-	Library of spur gear utility routines
-*/
 var gears = {
 
 	dupliate_points: function( pnts ){
@@ -93,12 +88,13 @@ var gears = {
 		return Math.PI*this.pitch_diameter(module,pressure_angle,num_teeth)/(2.0*num_teeth);
 	},
 
-	generate: function( module, pressure_angle, num_teeth ){
+	generate: function(outline, inline, teeth, module, pressure_angle, num_teeth ){
 		var Rp = this.pitch_diameter(module,pressure_angle,num_teeth)/2.0;
 		var Rb = this.base_diameter(module,pressure_angle,num_teeth)/2.0;
 		var Rd = Rp - this.dedendum(module,pressure_angle,num_teeth);
 		var Ra = Rp + this.addendum(module,pressure_angle,num_teeth);
 		var t  = this.tooth_thickness(module,pressure_angle,num_teeth);
+
 
 		// find the crossing point of the involute curve with the pitch circle
 		var p_cross = this.involute_point( Rb, this.involute_bisect( Rb, Rp ) );
@@ -107,6 +103,7 @@ var gears = {
 
 		// compute whether the gear profile will self-intersect once patterned
     	var tmp = this.involute_curve( Rb, Math.PI/2, Rd, Ra, 20 );
+		console.log("tmp: ", tmp.map(point => `${point[0]}, ${point[1]}`).join('\n'));
 		var cnt = 0;
     	var involute = [];
     	for( var i=0; i<tmp.length; i++ ){
@@ -118,20 +115,28 @@ var gears = {
     	}
 
 
-    	var cnt = 0;
-    	var gear = [];
     	for( var i=0; i<num_teeth; i++ ){
       		var theta = i*Math.PI*2.0/(num_teeth)+theta_cross-dtheta/2;
       		var theta2 = i*Math.PI*2.0/(num_teeth)-theta_cross+dtheta/2;
+			var tooth=[];
+			var ptx;
 
       		for( var j=0; j<involute.length; j++ ){
-      			gear[cnt++] = this.rotate_point( [0,0], [ involute[j][0], involute[j][1] ], theta );
+      			pt = this.rotate_point( [0,0], [ involute[j][0], involute[j][1] ], theta );
+				ptx = { x: pt[0], y: pt[1]}
+				outline.push(ptx);
+				tooth.push(ptx);
+				if (j==0) inline.push(ptx);
       		}
       		for( var j=involute.length-1; j>=0; j-- ){
-      			gear[cnt++] = this.rotate_point( [0,0], [ involute[j][0], -involute[j][1] ], theta2 );
+      			pt = this.rotate_point( [0,0], [ involute[j][0], -involute[j][1] ], theta2 );
+				ptx = { x: pt[0], y: pt[1]}
+				outline.push(ptx);
+				tooth.push(ptx);
       		}
-    	}
-    	return gear;
-	}
 
+			inline.push(ptx);
+			teeth.push(tooth);
+    	}
+	}
 };

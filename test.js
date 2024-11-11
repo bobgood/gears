@@ -36,22 +36,23 @@ function extrudeAndAddToScene(outline, inline, teeth, extrusionDepth, offsetX = 
     return extrudedMesh; // Return the mesh to store in a variable
 }
 
+let outline, inline, teeth;
 // Test function to generate the gear shape
 function test() {
-    const outline = [];
-    const inline = [];
-    const teeth = [];
+     outline = [];
+     inline = [];
+     teeth = [];
     const addendum = 2; // Large addendum to make the tooth stand out
     const dedendum = 1; // Large dedendum to make the root obvious
-    const toothCount = 9;
+    const toothCount = 4;
     const segments = Math.max(2, 180/toothCount);
     const tipFrac = 0.4;
     const pressureAngle = 20 * Math.PI / 180;
+    const module = 1;
 
     // Populate the outline, inline, and teeth arrays with the gear shape
-    gear(outline, inline, teeth, pitchRadius - dedendum, pitchRadius + dedendum, toothCount, tipFrac, pressureAngle, segments);
-
-    // Extrude and add the first gear to the scene
+    // gear(outline, inline, teeth, pitchRadius - dedendum, pitchRadius + dedendum, toothCount, tipFrac, pressureAngle, segments);
+    gears.generate(outline, inline, teeth, module, pressureAngle, toothCount);
     const extrusionDepth = 2;
     extrudedMesh1 = extrudeAndAddToScene(outline, inline, teeth, extrusionDepth,0, 0x0077ff);
 
@@ -59,8 +60,28 @@ function test() {
     extrudedMesh2 = extrudeAndAddToScene(outline, inline, teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
 }
 
+function see(outline, col) {
+    const points = outline.map(p => new THREE.Vector2(p.x, p.y));
+
+    // Create a shape from the points
+    const shape = new THREE.Shape(points);
+
+    // Create geometry from shape
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    // Create a line material
+    const lineMaterial = new THREE.LineBasicMaterial({ color: col });
+
+    // Create the line and add it to the scene
+    const line = new THREE.Line(geometry, lineMaterial);
+    scene.add(line);
+};
+
 // Run the test function to add the extruded shapes to the scene
 test();
+//see(outline, 0xff0000);
+//see(inline, 0xff00);
+//see(teeth[0], 0xff);
 
 // Position the camera to view both shapes
 camera.position.set(15, 15, 20); // Adjusted to see both objects
@@ -74,7 +95,7 @@ function animate() {
     if (extrudedMesh1 && extrudedMesh2) {
         extrudedMesh1.rotation.z += 0.01; // Rotate around z-axis
         extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
-        camera.rotation.z+=.05;
+        //camera.rotation.z+=.05;
     }
 
     renderer.render(scene, camera);
