@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/gears/FileContentIndex
+/.vs/gears/v17
+/.vs/gears/config
+/.vs
