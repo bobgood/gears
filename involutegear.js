@@ -1,3 +1,4 @@
+
 class Gear {
     constructor(module, numTeeth, pressureAngle) {
 		console.log(module, numTeeth, pressureAngle);
@@ -166,3 +167,11 @@ class Gear {
     	}
 	}
 };
+
+class PlanetaryGear extends Gear {
+    constructor(module, numTeeth, pressureAngle, Router) {
+        super(module, numTeeth, pressureAngle);
+        this.gapWidth = gapWidth;
+    }
+}
+

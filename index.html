@@ -10,13 +10,66 @@
     <script defer src="extrude.js"></script>
     <script defer src="involutegear.js"></script>
     <script defer src="test.js"></script>
-    <style>
+     <style>
+        /* Style for the slider */
+        .slider-container {
+          position: absolute;
+          top: 100px;
+          left: 10px;
+          transform: translateY(-50%);
+          z-index: 10;
+          background: rgba(255, 255, 255, 0.8);
+          padding: 10px;
+          border-radius: 5px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Style for the three.js canvas */
+        body, html {
+          margin: 0;
+          overflow: hidden;
+          height: 100%;
+        }
+        canvas {
+          display: block;
+        }
         /* Make the canvas take up the full screen */
         body { margin: 0; }
         canvas { display: block; }
     </style>
 </head>
 <body>
+    
+  <!-- Slider container -->
+  <div class="slider-container">
+    <div>
+        <label for="mySlider1">RotateX:</label>
+        <input type="range" id="mySlider1" min="0" max="100" value="50">
+        <span id="sliderValue1">50</span>
+    </div><div>
+        <label for="mySlider2">Zoom:</label>
+        <input type="range" id="mySlider2" min="0" max="100" value="50">
+        <span id="sliderValue2">50</span>
+    </div><div>
+        <label for="mySlider3">RotateX:</label>
+        <input type="range" id="mySlider3" min="0" max="100" value="50">
+        <span id="sliderValue3">50</span>
+    </div><div>
+        <label for="mySlider4">GearA:</label>
+        <input type="range" id="mySlider4" min="0" max="100" value="50">
+        <span id="sliderValue4">50</span>
+    </div><div>
+        <label for="mySlider5">GearB:</label>
+        <input type="range" id="mySlider5" min="0" max="100" value="50">
+        <span id="sliderValue5">50</span>
+    </div><div>
+        <label for="mySlider6">Eccentricity:</label>
+        <input type="range" id="mySlider6" min="0" max="100" value="50">
+        <span id="sliderValue6">50</span>
+      </div>
+  </div>
+
     <!-- Canvas will automatically be created by Three.js in the script -->
 </body>
 </html>

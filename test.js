@@ -51,32 +51,16 @@ function test() {
     extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.Inline, gear.Teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
 }
 
-function see(outline, col) {
-    const points = outline.map(p => new THREE.Vector2(p.x, p.y));
-
-    // Create a shape from the points
-    const shape = new THREE.Shape(points);
-
-    // Create geometry from shape
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-    // Create a line material
-    const lineMaterial = new THREE.LineBasicMaterial({ color: col });
-
-    // Create the line and add it to the scene
-    const line = new THREE.Line(geometry, lineMaterial);
-    scene.add(line);
-};
 
 // Run the test function to add the extruded shapes to the scene
 test();
-//see(outline, 0xff0000);
-//see(inline, 0xff00);
-//see(teeth[0], 0xff);
 
 // Position the camera to view both shapes
 camera.position.set(15, 15, 20); // Adjusted to see both objects
 camera.lookAt(0, 0, 0); // Point the camera at the center of the scene
+
+ const slider1 = document.getElementById('mySlider1');
+ const sliderValueDisplay1 = document.getElementById('sliderValue1');
 
 // Animation loop to render the scene
 function animate() {
@@ -84,13 +68,19 @@ function animate() {
     
     // Rotate both extruded meshes if they exist
     if (extrudedMesh1 && extrudedMesh2) {
-        extrudedMesh1.rotation.z += 0.01; // Rotate around z-axis
-        extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
+        //extrudedMesh1.rotation.z += 0.01; // Rotate around z-axis
+        //extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
         //camera.rotation.z+=.05;
+
+        const value = slider1.value;
+        sliderValueDisplay1.textContent = value;
+        // Use the slider value in your three.js code, e.g., to change cube rotation speed
+          extrudedMesh1.rotation.z = Math.Pi*value/200; // Rotate around z-axis
+          extrudedMesh2.rotation.z = -Math.Pi*value/200; // Rotate around z-axis
     }
 
     renderer.render(scene, camera);
 }
-
+ 
 // Start the animation loop
 animate();
