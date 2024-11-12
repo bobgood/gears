@@ -48,8 +48,8 @@ function test(numTeeth=4) {
     extrudedMesh1 = extrudeAndAddToScene(gear.Outline, gear.InnerOutline, gear.Faces, gear.Teeth, extrusionDepth,0, 0x0077ff);
 
     // Extrude and add the second gear, offset to the right by the pitchRadius * 2
-    //scene.remove(extrudedMesh2);
-    //extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.InnerOutline, gear.Faces, gear.Teeth, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
+    scene.remove(extrudedMesh2);
+    extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.InnerOutline, gear.Faces, gear.Teeth, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
 }
 
 
@@ -76,32 +76,35 @@ const sliderValueDisplay6 = document.getElementById('sliderValue6');
 // Animation loop to render the scene
 function animate() {
     requestAnimationFrame(animate);
+    const value1 = slider1.value;
+    sliderValueDisplay1.textContent = value1;
+    const value2 = slider2.value;
+    sliderValueDisplay2.textContent = value2;
+    const value3 = slider3.value;
+    sliderValueDisplay3.textContent = value3;
+    const value4 = slider4.value;
+    sliderValueDisplay4.textContent = value4;
+    const value5 = slider5.value;
+    sliderValueDisplay5.textContent = value5;
+    const value6 = slider6.value;
+    sliderValueDisplay6.textContent = value6;
+
+    test(value6)
     
     // Rotate both extruded meshes if they exist
-    if (extrudedMesh1 && extrudedMesh2) {
+    if (extrudedMesh1) {
         extrudedMesh1.rotation.z += 0.01; // Rotate around z-axis
-        //extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
         //camera.rotation.z+=.05;
 
-        const value1 = slider1.value;
-        sliderValueDisplay1.textContent = value1;
-        const value2 = slider2.value;
-        sliderValueDisplay2.textContent = value2;
-        const value3 = slider3.value;
-        sliderValueDisplay3.textContent = value3;
-        const value4 = slider4.value;
-        sliderValueDisplay4.textContent = value4;
-        const value5 = slider5.value;
-        sliderValueDisplay5.textContent = value5;
-        const value6 = slider6.value;
-        sliderValueDisplay6.textContent = value6;
-
-        test(value6)
         var rot2=Math.PI/value6+Math.PI;
 
 //        // Use the slider value in your three.js code, e.g., to change cube rotation speed
           extrudedMesh1.rotation.z = Math.PI*value1/200; // Rotate around z-axis
-         // extrudedMesh2.rotation.z = rot2-Math.PI*value1/200; // Rotate around z-axis
+    }
+    if (extrudedMesh2) {
+        extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
+         extrudedMesh2.rotation.z = rot2-Math.PI*value1/200; // Rotate around z-axis
+
     }
 
     renderer.render(scene, camera);
