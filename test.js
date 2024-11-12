@@ -15,7 +15,7 @@ directionalLight.position.set(5, 5, 10); // Position the light above and to the 
 scene.add(directionalLight);
 
 // Variables to store both extruded meshes for rotation
-let extrudedMesh1, extrudedMesh2;
+let extrudedMesh1= null, extrudedMesh2=null;
 const pitchRadius = 5;
 
 // Function to instantiate and add an extruded mesh to the scene
@@ -38,17 +38,18 @@ function extrudeAndAddToScene(outline, inline, teeth, extrusionDepth, offsetX = 
 
 let outline, inline, teeth;
 // Test function to generate the gear shape
-function test() {
-    const numTeeth = 4;
+function test(numTeeth=4) {
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
-    const gear = new Gear(module, numTeeth, pressureAngle);
+    const gear = new SimpleGear(module, numTeeth, pressureAngle);
     const extrusionDepth = 2;
+    scene.remove(extrudedMesh1);
     extrudedMesh1 = extrudeAndAddToScene(gear.Outline, gear.Inline, gear.Teeth, extrusionDepth,0, 0x0077ff);
 
     // Extrude and add the second gear, offset to the right by the pitchRadius * 2
-    extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.Inline, gear.Teeth, extrusionDepth, pitchRadius * 2, 0x00ff88);
+    scene.remove(extrudedMesh2);
+    extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.Inline, gear.Teeth, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
 }
 
 
@@ -59,8 +60,18 @@ test();
 camera.position.set(15, 15, 20); // Adjusted to see both objects
 camera.lookAt(0, 0, 0); // Point the camera at the center of the scene
 
- const slider1 = document.getElementById('mySlider1');
- const sliderValueDisplay1 = document.getElementById('sliderValue1');
+const slider1 = document.getElementById('mySlider1');
+const sliderValueDisplay1 = document.getElementById('sliderValue1');
+const slider2 = document.getElementById('mySlider2');
+const sliderValueDisplay2 = document.getElementById('sliderValue2');
+const slider3 = document.getElementById('mySlider3');
+const sliderValueDisplay3 = document.getElementById('sliderValue3');
+const slider4 = document.getElementById('mySlider4');
+const sliderValueDisplay4 = document.getElementById('sliderValue4');
+const slider5 = document.getElementById('mySlider5');
+const sliderValueDisplay5 = document.getElementById('sliderValue5');
+const slider6 = document.getElementById('mySlider6');
+const sliderValueDisplay6 = document.getElementById('sliderValue6');
 
 // Animation loop to render the scene
 function animate() {
@@ -72,11 +83,25 @@ function animate() {
         //extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
         //camera.rotation.z+=.05;
 
-        const value = slider1.value;
-        sliderValueDisplay1.textContent = value;
-        // Use the slider value in your three.js code, e.g., to change cube rotation speed
-          extrudedMesh1.rotation.z = Math.Pi*value/200; // Rotate around z-axis
-          extrudedMesh2.rotation.z = -Math.Pi*value/200; // Rotate around z-axis
+        const value1 = slider1.value;
+        sliderValueDisplay1.textContent = value1;
+        const value2 = slider2.value;
+        sliderValueDisplay2.textContent = value2;
+        const value3 = slider3.value;
+        sliderValueDisplay3.textContent = value3;
+        const value4 = slider4.value;
+        sliderValueDisplay4.textContent = value4;
+        const value5 = slider5.value;
+        sliderValueDisplay5.textContent = value5;
+        const value6 = slider6.value;
+        sliderValueDisplay6.textContent = value6;
+
+        test(value6)
+        var rot2=Math.PI/value6+Math.PI;
+
+//        // Use the slider value in your three.js code, e.g., to change cube rotation speed
+          extrudedMesh1.rotation.z = Math.PI*value1/200; // Rotate around z-axis
+          extrudedMesh2.rotation.z = rot2-Math.PI*value1/200; // Rotate around z-axis
     }
 
     renderer.render(scene, camera);

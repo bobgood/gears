@@ -31,7 +31,6 @@ class Gear {
 
 		this.Base_involute_curve = this.involute_curve();
 
-		this.generate();
 		console.log(this.Outline);
     }
 
@@ -125,6 +124,14 @@ class Gear {
 		return Math.PI*this.pitch_diameter()/(2.0*this.NumTeeth);
 	}
 
+}
+
+class SimpleGear extends Gear {
+    constructor(module, numTeeth, pressureAngle) {
+		super(module,numTeeth,pressureAngle);
+		this.generate();
+	}
+
 	generate(){
 		// find the crossing point of the involute curve with the pitch circle
 		var p_cross = this.involute_point(  this.involute_bisect( this.Rpitch ) );
@@ -166,10 +173,10 @@ class Gear {
 			this.Teeth.push(tooth);
     	}
 	}
-};
+}
 
 class PlanetaryGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, Router) {
+    constructor(module, numTeeth, pressureAngle) {
         super(module, numTeeth, pressureAngle);
         this.gapWidth = gapWidth;
     }
