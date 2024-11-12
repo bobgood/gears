@@ -41,13 +41,8 @@ class Gear {
 		// calculates the coordinates of the involute curve
 		this.Involute=this.create_involute_coordinates();
 
-		console.log(this.Involute);
-		console.log();
-
 		// upside down for planetary
 		this.InvertInvolute = this.create_invert_involute_coordinates();
-		console.log(this.InvertInvolute);
-		console.log();
     }
 
 	point_radius( pnt ){
@@ -253,22 +248,16 @@ class PlanetaryGear extends Gear {
 
       		for( var j=this.InvertInvolute.length-1; j>=0; j-- ){
       			pt = this.rotate_point( {x:0,y:0}, {x: this.InvertInvolute[j].x, y:-this.Involute[j].y }, theta2 );
-				this.Outline.push(pt);
+				this.InnerOutline.push(pt);
 				tooth.push(pt);
 				if (j==0) face.push(pt);
       		}
 			
-			// 0 and 2 are the same
-			// 3 and 4 are the same
 			face.push(pt3);
 			face.push(opt3);
 			face.push(opt);
-			console.log(face);
-			console.log();
 			this.Faces.push(face);
 			this.Teeth.push(tooth);
-			console.log(tooth);
-			console.log();
     	}
 	}
 }

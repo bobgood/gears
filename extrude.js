@@ -47,12 +47,17 @@ class Extrude {
         return extrudedMesh;
     }
 
-    extrudeShape(outline, faces, teeth, depth) {
-//        // Extrude the sides based on the outline shape
-//        for (let i = 0; i < outline.length; i++) {
-//            const i2 = (i + 1) % outline.length;
-//            this.addEdgeQuad(outline[i], outline[i2], depth);
-//        }
+    extrudeShape(outline, innerOutline, faces, teeth, depth) {
+        // Extrude the sides based on the outline shape
+        for (let i = 0; i < outline.length; i++) {
+            const i2 = (i + 1) % outline.length;
+            this.addEdgeQuad(outline[i], outline[i2], depth);
+        }
+
+        for (let i = 0; i < innerOutline.length; i++) {
+            const i2 = (i + 1) % innerOutline.length;
+            this.addEdgeQuad(innerOutline[i2], innerOutline[i], depth);
+        }
 
         // Add front and back faces for the `teeth` and `inline` shapes
         for (let i = 0; i < teeth.length; i++) {
