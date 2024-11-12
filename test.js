@@ -15,7 +15,7 @@ directionalLight.position.set(5, 5, 10); // Position the light above and to the 
 scene.add(directionalLight);
 
 // Variables to store both extruded meshes for rotation
-let extrudedMesh1= null, extrudedMesh2=null, extrudedMesh3=null;
+let extrudedMesh1= null, extrudedMesh2=null, extrudedMesh3=null, extrudedMesh4=null;
 const pitchRadius = 5;
 
 // Function to instantiate and add an extruded mesh to the scene
@@ -55,6 +55,12 @@ function test(numTeeth=4) {
     scene.remove(extrudedMesh3);
     extrudedMesh3 = extrudeAndAddToScene(pgear.Outline, pgear.InnerOutline, pgear.Faces, pgear.Teeth, extrusionDepth,0, 0xff77ff);
     extrudedMesh3.position.z = 5;
+
+    const egear = new EllipticalGear(module, numTeeth, pressureAngle, .2);
+    scene.remove(extrudedMesh4);
+    extrudedMesh4 = extrudeAndAddToScene(egear.Outline, egear.InnerOutline, egear.Faces, egear.Teeth, extrusionDepth, 0, 0xffffff);
+    extrudedMesh4.position.z = 10;
+
 }
 
 

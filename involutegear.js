@@ -207,9 +207,9 @@ class SimpleGear extends Gear {
 }
 
 class PlanetaryGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, outsideRadius=0) {
-        super(module, Math.max(20,numTeeth), pressureAngle);
-		this.OutsideRadius = Math.max(outsideRadius,this.Raddendum+1*module)
+	constructor(module, numTeeth, pressureAngle, outsideRadius = 0) {
+		super(module, Math.max(20, numTeeth), pressureAngle);
+		this.OutsideRadius = Math.max(outsideRadius, this.Raddendum + 1 * module)
 
 		// these values were just used to build the teeth,
 		// this.Rpitch 
@@ -219,46 +219,93 @@ class PlanetaryGear extends Gear {
 		this.generate_planet_gear();
 	}
 
-	generate_planet_gear(){
+	generate_planet_gear() {
 
-		let pt,pt3;
+		let pt, pt3;
 
-		
-    	for( var i=0; i<this.NumTeeth; i++ ){
-      		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
-      		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
-      		var theta3 = (i+1)*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
-      		var opt = this.rotate_point( {x:0,y:0}, {x:this.OutsideRadius, y:0 }, theta );
-      		var opt3 = this.rotate_point( {x:0,y:0}, {x:this.OutsideRadius, y:0 }, theta3 );
+
+		for (var i = 0; i < this.NumTeeth; i++) {
+			var theta = i * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+			var theta2 = i * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+			var theta3 = (i + 1) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+			var opt = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta);
+			var opt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta3);
 			this.Outline.push(opt);
 
-			var tooth=[];
-			var face=[];
+			var tooth = [];
+			var face = [];
 
-      		for( var j=0; j<this.InvertInvolute.length; j++ ){
-      			pt = this.rotate_point( {x:0,y:0}, {x:this.InvertInvolute[j].x, y:this.InvertInvolute[j].y }, theta );
+			for (var j = 0; j < this.InvertInvolute.length; j++) {
+				pt = this.rotate_point({ x: 0, y: 0 }, { x: this.InvertInvolute[j].x, y: this.InvertInvolute[j].y }, theta);
 				this.InnerOutline.push(pt);
 				tooth.push(pt);
-				if (j==0)
-				{ 
-	      			pt3 = this.rotate_point( {x:0,y:0}, {x:this.InvertInvolute[j].x, y:this.InvertInvolute[j].y }, theta3 );
+				if (j == 0) {
+					pt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.InvertInvolute[j].x, y: this.InvertInvolute[j].y }, theta3);
 					face.push(pt);
 				}
-      		}
+			}
 
-      		for( var j=this.InvertInvolute.length-1; j>=0; j-- ){
-      			pt = this.rotate_point( {x:0,y:0}, {x: this.InvertInvolute[j].x, y:-this.Involute[j].y }, theta2 );
+			for (var j = this.InvertInvolute.length - 1; j >= 0; j--) {
+				pt = this.rotate_point({ x: 0, y: 0 }, { x: this.InvertInvolute[j].x, y: -this.Involute[j].y }, theta2);
 				this.InnerOutline.push(pt);
 				tooth.push(pt);
-				if (j==0) face.push(pt);
-      		}
-			
+				if (j == 0) face.push(pt);
+			}
+
 			face.push(pt3);
 			face.push(opt3);
 			face.push(opt);
 			this.Faces.push(face);
 			this.Teeth.push(tooth);
-    	}
+		}
+	}
+}
+
+class EllipticalGear extends Gear {
+	constructor(module, numTeeth, pressureAngle, eccentricity) {
+		super(module, Math.max(8, numTeeth), pressureAngle);
+		this.Eccentricity = eccentricity;
+		this.A = solveForSemiMajorAxis(Math.PI * 2 * this.Rpitch, this.Eccentricity, this.Rpitch);
+		this.B = this.A * Math.sqrt(1 - this.Eccentricity ** 2);
+		this.EllipseArcDistance = ellipseArcDistance(this.Eccentricity);
+		// these values were just used to build the teeth,
+		// this.Rpitch 
+		// this.Rbase 
+		// this.Rdedendum 
+		// this.Raddendum 
+		this.generate_elliptical_gear();
+	}
+
+
+	generate_elliptical_gear() {
+
+		let pt;
+		var inline = [];
+		for (var i = 0; i < this.NumTeeth; i++) {
+			var ctheta = i * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+			var theta = circleThetaToElipse(ctheta, this.EllipseArcDistance);
+			var ctheta2 = i * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+			var theta2 = circleThetaToElipse(ctheta2, this.EllipseArcDistance);
+			var tooth = [];
+
+			for (var j = 0; j < this.Involute.length; j++) {
+				pt = rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: this.Involute[j].y }, theta, this.A, this.B, this.Rpitch);
+				this.Outline.push(pt);
+				tooth.push(pt);
+				if (j == 0) inline.push(pt);
+			}
+
+			for (var j = this.Involute.length - 1; j >= 0; j--) {
+				pt = rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: -this.Involute[j].y }, theta2, this.A, this.B, this.Rpitch);
+				this.Outline.push(pt);
+				tooth.push(pt);
+				if (j == 0) inline.push(pt);
+			}
+
+			this.Teeth.push(tooth);
+		}
+
+		this.Faces.push(inline);
 	}
 }
 
