@@ -1,7 +1,6 @@
 
 class Gear {
     constructor(module, numTeeth, pressureAngle) {
-		console.log(module, numTeeth, pressureAngle);
         this.Module = module;
         this.NumTeeth = numTeeth;
         this.PressureAngle = pressureAngle;
@@ -29,9 +28,11 @@ class Gear {
 		// smoothing points along the involute curve
 		this.Smoothing = 20;
 
+		// calculates the form of the involute curve
 		this.Base_involute_curve = this.involute_curve();
 
-		console.log(this.Outline);
+		// calculates the coordinates of the involute curve
+		this.Involute=this.create_involute_coordinates();
     }
 
 	point_radius( pnt ){
@@ -103,8 +104,30 @@ class Gear {
 		return curve;
 	}
 
+	create_involute_coordinates()
+	{
+		// find the crossing point of the involute curve with the pitch circle
+		this.p_cross = this.involute_point(  this.involute_bisect( this.Rpitch ) );
+	    this.theta_cross = Math.atan2( this.p_cross.y, this.p_cross.x );
+		this.dtheta = this.Ttooth/this.Rpitch;
+	
+
+		// compute whether the gear profile will self-intersect once patterned
+    	var involute_pts = [];
+    	for( var i=0; i<this.Base_involute_curve.length; i++ ){
+    		var tpnt = this.rotate_point( {x:0,y:0}, this.Base_involute_curve[i], +this.theta_cross-this.dtheta/2 );
+    		var angle1 = Math.atan2( tpnt.y, tpnt.x );
+    		if( angle1 < Math.PI/this.NumTeeth && tpnt.y > 0 ){
+    			involute_pts.push(this.Base_involute_curve[i]);
+    		}
+    	}
+
+		return involute_pts
+
+	}
+
+
 	pitch_diameter( ){
-		console.log(this.Module, this.NumTeeth, this.PressureAngle);
 		return this.Module*this.NumTeeth;
 	}
 
@@ -133,39 +156,24 @@ class SimpleGear extends Gear {
 
 	}
 
+
 	generate_simple_gear(){
-		// find the crossing point of the involute curve with the pitch circle
-		this.p_cross = this.involute_point(  this.involute_bisect( this.Rpitch ) );
-	    this.theta_cross = Math.atan2( this.p_cross.y, this.p_cross.x );
-		this.dtheta = this.Ttooth/this.Rpitch;
-	
 
-		// compute whether the gear profile will self-intersect once patterned
-    	var involute = [];
 		let pt;
-    	for( var i=0; i<this.Base_involute_curve.length; i++ ){
-    		var tpnt = this.rotate_point( {x:0,y:0}, this.Base_involute_curve[i], +this.theta_cross-this.dtheta/2 );
-    		var angle1 = Math.atan2( tpnt.y, tpnt.x );
-    		if( angle1 < Math.PI/this.NumTeeth && tpnt.y > 0 ){
-    			involute.push(this.Base_involute_curve[i]);
-    		}
-    	}
-
-
-
     	for( var i=0; i<this.NumTeeth; i++ ){
       		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
       		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
 			var tooth=[];
 
-      		for( var j=0; j<involute.length; j++ ){
-      			pt = this.rotate_point( {x:0,y:0}, {x:involute[j].x, y:involute[j].y }, theta );
+      		for( var j=0; j<this.Involute.length; j++ ){
+      			pt = this.rotate_point( {x:0,y:0}, {x:this.Involute[j].x, y:this.Involute[j].y }, theta );
 				this.Outline.push(pt);
 				tooth.push(pt);
 				if (j==0) this.Inline.push(pt);
       		}
-      		for( var j=involute.length-1; j>=0; j-- ){
-      			pt = this.rotate_point( {x:0,y:0}, {x: involute[j].x, y:-involute[j].y }, theta2 );
+
+      		for( var j=this.Involute.length-1; j>=0; j-- ){
+      			pt = this.rotate_point( {x:0,y:0}, {x: this.Involute[j].x, y:-this.Involute[j].y }, theta2 );
 				this.Outline.push(pt);
 				tooth.push(pt);
 				if (j==0) this.Inline.push(pt);
