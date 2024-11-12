@@ -1,21 +1,17 @@
-
-class Gear {
-    constructor(module, numTeeth, pressureAngle) {
+class Shape2D {
+	constructor() {
+		// outer outline
+		this.Outlines = [];
+		// edge between teeth and core
+		this.Faces = [];
+	}
+}
+class Gear extends Shape2D {
+	constructor(module, numTeeth, pressureAngle) {
+		super();
         this.Module = module;
         this.NumTeeth = numTeeth;
         this.PressureAngle = pressureAngle;
-
-		// outer outline
-        this.Outline = [];
-		// edge between teeth and core
-        this.Faces = [];
-
-		// inner outline
-        this.InnerOutline = [];
-
-		// outlines of individual teeth.
-        this.Teeth = [];
-
 
 		// Rp aka r pitch
 		this.Rpitch = this.pitch_diameter()/2.0;
@@ -180,6 +176,7 @@ class SimpleGear extends Gear {
 
 		let pt;
 		var inline=[];
+		var outline = [];
     	for( var i=0; i<this.NumTeeth; i++ ){
       		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
       		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
@@ -187,22 +184,23 @@ class SimpleGear extends Gear {
 
       		for( var j=0; j<this.Involute.length; j++ ){
       			pt = this.rotate_point( {x:0,y:0}, {x:this.Involute[j].x, y:this.Involute[j].y }, theta );
-				this.Outline.push(pt);
+				outline.push(pt);
 				tooth.push(pt);
 				if (j==0) inline.push(pt);
       		}
 
       		for( var j=this.Involute.length-1; j>=0; j-- ){
       			pt = this.rotate_point( {x:0,y:0}, {x: this.Involute[j].x, y:-this.Involute[j].y }, theta2 );
-				this.Outline.push(pt);
+				outline.push(pt);
 				tooth.push(pt);
 				if (j==0) inline.push(pt);
       		}
 
-			this.Teeth.push(tooth);
+			this.Faces.push(tooth);
     	}
 
 		this.Faces.push(inline);
+		this.Outlines.push(outline);
 	}
 }
 
@@ -223,21 +221,23 @@ class PlanetaryGear extends Gear {
 
 		let pt, pt3;
 
-
+		var outline = [];
+		var innerOutline = [];
+		
 		for (var i = 0; i < this.NumTeeth; i++) {
 			var theta = i * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
 			var theta2 = i * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
 			var theta3 = (i + 1) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
 			var opt = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta);
 			var opt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta3);
-			this.Outline.push(opt);
+			outline.push(opt);
 
 			var tooth = [];
 			var face = [];
 
 			for (var j = 0; j < this.InvertInvolute.length; j++) {
 				pt = this.rotate_point({ x: 0, y: 0 }, { x: this.InvertInvolute[j].x, y: this.InvertInvolute[j].y }, theta);
-				this.InnerOutline.push(pt);
+				innerOutline.push(pt);
 				tooth.push(pt);
 				if (j == 0) {
 					pt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.InvertInvolute[j].x, y: this.InvertInvolute[j].y }, theta3);
@@ -247,7 +247,7 @@ class PlanetaryGear extends Gear {
 
 			for (var j = this.InvertInvolute.length - 1; j >= 0; j--) {
 				pt = this.rotate_point({ x: 0, y: 0 }, { x: this.InvertInvolute[j].x, y: -this.Involute[j].y }, theta2);
-				this.InnerOutline.push(pt);
+				innerOutline.push(pt);
 				tooth.push(pt);
 				if (j == 0) face.push(pt);
 			}
@@ -256,7 +256,9 @@ class PlanetaryGear extends Gear {
 			face.push(opt3);
 			face.push(opt);
 			this.Faces.push(face);
-			this.Teeth.push(tooth);
+			this.Faces.push(tooth);
+			this.Outlines.push(outline);
+			this.Outlines.push(innerOutline);			
 		}
 	}
 }
@@ -281,6 +283,7 @@ class EllipticalGear extends Gear {
 
 		let pt;
 		var inline = [];
+		var outline = [];
 		for (var i = 0; i < this.NumTeeth; i++) {
 			var ctheta = i * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
 			var theta = circleThetaToElipse(ctheta, this.EllipseArcDistance);
@@ -290,22 +293,24 @@ class EllipticalGear extends Gear {
 
 			for (var j = 0; j < this.Involute.length; j++) {
 				pt = rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: this.Involute[j].y }, theta, this.A, this.B, this.Rpitch);
-				this.Outline.push(pt);
+				outline.push(pt);
 				tooth.push(pt);
 				if (j == 0) inline.push(pt);
 			}
 
 			for (var j = this.Involute.length - 1; j >= 0; j--) {
 				pt = rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: -this.Involute[j].y }, theta2, this.A, this.B, this.Rpitch);
-				this.Outline.push(pt);
+				outline.push(pt);
 				tooth.push(pt);
 				if (j == 0) inline.push(pt);
 			}
 
-			this.Teeth.push(tooth);
+			this.Faces.push(tooth);
 		}
 
 		this.Faces.push(inline);
+		this.Outlines.push(outline);
 	}
 }
+
 

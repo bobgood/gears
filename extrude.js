@@ -47,27 +47,23 @@ class Extrude {
         return extrudedMesh;
     }
 
-    extrudeShape(outline, innerOutline, faces, teeth, depth) {
+    extrudeShape(shape, depth) {
         // Extrude the sides based on the outline shape
-        for (let i = 0; i < outline.length; i++) {
-            const i2 = (i + 1) % outline.length;
-            this.addEdgeQuad(outline[i], outline[i2], depth);
+        for (let j = 0; j < shape.Outlines.length; j++) {
+            var outline = shape.Outlines[j];
+            for (let i = 0; i < outline.length; i++) {
+                const i2 = (i + 1) % outline.length;
+                if (j == 0) {
+                    this.addEdgeQuad(outline[i], outline[i2], depth);
+                }
+                else {
+                    this.addEdgeQuad(outline[i2], outline[i], depth);
+                }
+            }
         }
 
-        for (let i = 0; i < innerOutline.length; i++) {
-            const i2 = (i + 1) % innerOutline.length;
-            this.addEdgeQuad(innerOutline[i2], innerOutline[i], depth);
-        }
-
-        // Add front and back faces for the `teeth` and `inline` shapes
-        for (let i = 0; i < teeth.length; i++) {
-            const tooth = teeth[i];
-            this.buildFace(tooth, 0);       // Bottom face of each tooth
-            this.buildFace(tooth, depth);   // Top face of each tooth
-        }
-
-        for (let i = 0; i < faces.length; i++) {
-            const face = faces[i];
+        for (let i = 0; i < shape.Faces.length; i++) {
+            const face = shape.Faces[i];
             this.buildFace(face, 0);       // Bottom face of each tooth
             this.buildFace(face, depth);   // Top face of each tooth
         }
