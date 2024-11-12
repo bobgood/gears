@@ -15,7 +15,7 @@ directionalLight.position.set(5, 5, 10); // Position the light above and to the 
 scene.add(directionalLight);
 
 // Variables to store both extruded meshes for rotation
-let extrudedMesh1= null, extrudedMesh2=null;
+let extrudedMesh1= null, extrudedMesh2=null, extrudedMesh3=null;
 const pitchRadius = 5;
 
 // Function to instantiate and add an extruded mesh to the scene
@@ -42,7 +42,7 @@ function test(numTeeth=4) {
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
-    const gear = new PlanetaryGear(module, numTeeth, pressureAngle);
+    const gear = new SimpleGear(module, numTeeth, pressureAngle);
     const extrusionDepth = 2;
     scene.remove(extrudedMesh1);
     extrudedMesh1 = extrudeAndAddToScene(gear.Outline, gear.InnerOutline, gear.Faces, gear.Teeth, extrusionDepth,0, 0x0077ff);
@@ -50,6 +50,11 @@ function test(numTeeth=4) {
     // Extrude and add the second gear, offset to the right by the pitchRadius * 2
     scene.remove(extrudedMesh2);
     extrudedMesh2 = extrudeAndAddToScene(gear.Outline, gear.InnerOutline, gear.Faces, gear.Teeth, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
+
+    const pgear = new PlanetaryGear(module, numTeeth, pressureAngle);
+    scene.remove(extrudedMesh3);
+    extrudedMesh3 = extrudeAndAddToScene(pgear.Outline, pgear.InnerOutline, pgear.Faces, pgear.Teeth, extrusionDepth,0, 0xff77ff);
+    extrudedMesh3.position.z = 5;
 }
 
 
