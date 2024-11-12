@@ -7,11 +7,12 @@ class Shape2D {
 	}
 }
 class Gear extends Shape2D {
-	constructor(module, numTeeth, pressureAngle) {
+	constructor(module, numTeeth, pressureAngle, shift) {
 		super();
         this.Module = module;
         this.NumTeeth = numTeeth;
-        this.PressureAngle = pressureAngle;
+		this.PressureAngle = pressureAngle;
+		this.Shift = shift;
 
 		// Rp aka r pitch
 		this.Rpitch = this.pitch_diameter()/2.0;
@@ -166,8 +167,8 @@ class Gear extends Shape2D {
 }
 
 class SimpleGear extends Gear {
-    constructor(module, numTeeth, pressureAngle) {
-		super(module,numTeeth,pressureAngle);
+    constructor(module, numTeeth, pressureAngle, shift) {
+		super(module,numTeeth,pressureAngle, shift);
 		this.generate_simple_gear();
 
 	}
@@ -178,8 +179,8 @@ class SimpleGear extends Gear {
 		var inline=[];
 		var outline = [];
     	for( var i=0; i<this.NumTeeth; i++ ){
-      		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
-      		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
+      		var theta = (i+this.Shift)*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
+			var theta2 = (i + this.Shift) *Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
 			var tooth=[];
 
       		for( var j=0; j<this.Involute.length; j++ ){
@@ -205,8 +206,8 @@ class SimpleGear extends Gear {
 }
 
 class PlanetaryGear extends Gear {
-	constructor(module, numTeeth, pressureAngle, outsideRadius = 0) {
-		super(module, Math.max(20, numTeeth), pressureAngle);
+	constructor(module, numTeeth, pressureAngle, shift, outsideRadius = 0) {
+		super(module, Math.max(20, numTeeth), pressureAngle, shift);
 		this.OutsideRadius = Math.max(outsideRadius, this.Raddendum + 1 * module)
 
 		// these values were just used to build the teeth,
@@ -225,9 +226,9 @@ class PlanetaryGear extends Gear {
 		var innerOutline = [];
 		
 		for (var i = 0; i < this.NumTeeth; i++) {
-			var theta = i * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
-			var theta2 = i * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
-			var theta3 = (i + 1) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+			var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+			var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+			var theta3 = (i + this.Shift + 1) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
 			var opt = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta);
 			var opt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta3);
 			outline.push(opt);
@@ -264,8 +265,8 @@ class PlanetaryGear extends Gear {
 }
 
 class EllipticalGear extends Gear {
-	constructor(module, numTeeth, pressureAngle, eccentricity) {
-		super(module, Math.max(8, numTeeth), pressureAngle);
+	constructor(module, numTeeth, pressureAngle, shift, eccentricity) {
+		super(module, Math.max(8, numTeeth), shift, pressureAngle);
 		this.Eccentricity = eccentricity;
 		this.A = solveForSemiMajorAxis(Math.PI * 2 * this.Rpitch, this.Eccentricity, this.Rpitch);
 		this.B = this.A * Math.sqrt(1 - this.Eccentricity ** 2);

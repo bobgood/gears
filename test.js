@@ -42,7 +42,7 @@ function test(numTeeth=4) {
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
-    const gear = new SimpleGear(module, numTeeth, pressureAngle);
+    const gear = new SimpleGear(module, numTeeth, pressureAngle, 0);
     const extrusionDepth = 2;
     scene.remove(extrudedMesh1);
     extrudedMesh1 = extrudeAndAddToScene(gear, extrusionDepth,0, 0x0077ff);
@@ -51,12 +51,12 @@ function test(numTeeth=4) {
     scene.remove(extrudedMesh2);
     extrudedMesh2 = extrudeAndAddToScene(gear, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
 
-    const pgear = new PlanetaryGear(module, numTeeth, pressureAngle);
+    const pgear = new PlanetaryGear(module, numTeeth, pressureAngle,0);
     scene.remove(extrudedMesh3);
     extrudedMesh3 = extrudeAndAddToScene(pgear, extrusionDepth,0, 0xff77ff);
     extrudedMesh3.position.z = 5;
 
-    const egear = new EllipticalGear(module, numTeeth, pressureAngle, .2);
+    const egear = new EllipticalGear(module, numTeeth, pressureAngle, 0, .2);
     scene.remove(extrudedMesh4);
     extrudedMesh4 = extrudeAndAddToScene(egear, extrusionDepth, 0, 0xffffff);
     extrudedMesh4.position.z = 10;
