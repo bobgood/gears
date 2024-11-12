@@ -96,9 +96,9 @@ class Gear {
 		if( this.Rdedendum < this.Rbase ){
 			curve.push( {x: this.Rdedendum, y:0 });
 		}
-		var dtheta = (theta_hi-theta_lo)/(this.Smoothing-1);
+		var dtheta2 = (theta_hi-theta_lo)/(this.Smoothing-1);
 		for( var i=0; i<this.Smoothing; i++ ){
-			curve.push( this.involute_point( i*dtheta+theta_lo ));
+			curve.push( this.involute_point( i*dtheta2+theta_lo ));
 		}
 		return curve;
 	}
@@ -129,21 +129,22 @@ class Gear {
 class SimpleGear extends Gear {
     constructor(module, numTeeth, pressureAngle) {
 		super(module,numTeeth,pressureAngle);
-		this.generate();
+		this.generate_simple_gear();
+
 	}
 
-	generate(){
+	generate_simple_gear(){
 		// find the crossing point of the involute curve with the pitch circle
-		var p_cross = this.involute_point(  this.involute_bisect( this.Rpitch ) );
-		var theta_cross = Math.atan2( p_cross.y, p_cross.x );
-		var dtheta = this.Ttooth/this.Rpitch;
+		this.p_cross = this.involute_point(  this.involute_bisect( this.Rpitch ) );
+	    this.theta_cross = Math.atan2( this.p_cross.y, this.p_cross.x );
+		this.dtheta = this.Ttooth/this.Rpitch;
 	
 
 		// compute whether the gear profile will self-intersect once patterned
     	var involute = [];
 		let pt;
     	for( var i=0; i<this.Base_involute_curve.length; i++ ){
-    		var tpnt = this.rotate_point( {x:0,y:0}, this.Base_involute_curve[i], +theta_cross-dtheta/2 );
+    		var tpnt = this.rotate_point( {x:0,y:0}, this.Base_involute_curve[i], +this.theta_cross-this.dtheta/2 );
     		var angle1 = Math.atan2( tpnt.y, tpnt.x );
     		if( angle1 < Math.PI/this.NumTeeth && tpnt.y > 0 ){
     			involute.push(this.Base_involute_curve[i]);
@@ -153,8 +154,8 @@ class SimpleGear extends Gear {
 
 
     	for( var i=0; i<this.NumTeeth; i++ ){
-      		var theta = i*Math.PI*2.0/(this.NumTeeth)+theta_cross-dtheta/2;
-      		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-theta_cross+dtheta/2;
+      		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
+      		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
 			var tooth=[];
 
       		for( var j=0; j<involute.length; j++ ){
@@ -176,9 +177,19 @@ class SimpleGear extends Gear {
 }
 
 class PlanetaryGear extends Gear {
-    constructor(module, numTeeth, pressureAngle) {
+    constructor(module, numTeeth, pressureAngle, outsideRadius) {
         super(module, numTeeth, pressureAngle);
-        this.gapWidth = gapWidth;
-    }
+        this.OutsideRadius = outsideRadius;
+
+		// these values were just used to build the teeth,
+		// this.Rpitch 
+		// this.Rbase 
+		// this.Rdedendum 
+		// this.Raddendum 
+		this.generate_planet_gear();
+	}
+
+	generate_simple_gear(){
+	}
 }
 
