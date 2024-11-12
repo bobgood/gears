@@ -47,7 +47,7 @@ class Extrude {
         return extrudedMesh;
     }
 
-    extrudeShape(outline, inline, teeth, depth) {
+    extrudeShape(outline, faces, teeth, depth) {
         // Extrude the sides based on the outline shape
         for (let i = 0; i < outline.length; i++) {
             const i2 = (i + 1) % outline.length;
@@ -61,8 +61,11 @@ class Extrude {
             this.buildFace(tooth, depth);   // Top face of each tooth
         }
 
-        this.buildFace(inline, 0);        // Bottom face of the inline shape
-        this.buildFace(inline, depth);    // Top face of the inline shape
+        for (let i = 0; i < faces.length; i++) {
+            const face = faces[i];
+            this.buildFace(face, 0);       // Bottom face of each tooth
+            this.buildFace(face, depth);   // Top face of each tooth
+        }
     }
 
     addEdgeQuad(v1, v2, depth) {

@@ -4,10 +4,17 @@ class Gear {
         this.Module = module;
         this.NumTeeth = numTeeth;
         this.PressureAngle = pressureAngle;
+
+		// outer outline
         this.Outline = [];
-        this.Inline = [];
+		// edge between teeth and core
+        this.Faces = [];
+
+		// inner outline
+        this.InnerOutline = [];
+
+		// outlines of individual teeth.
         this.Teeth = [];
-        this.scene = new THREE.Scene();
 
 
 		// Rp aka r pitch
@@ -33,6 +40,9 @@ class Gear {
 
 		// calculates the coordinates of the involute curve
 		this.Involute=this.create_involute_coordinates();
+
+		// upside down for planetary
+		this.InvertInvolute = this.create_invert_involute_coordinates();
     }
 
 	point_radius( pnt ){
@@ -126,6 +136,16 @@ class Gear {
 
 	}
 
+	create_invert_involute_coordinates()
+	{
+		var invert_pts = [];
+		for(var i=0; i<this.Involute.length; i++){
+            invert_pts.push({x:this.Involute[i].x, y:this.Rpitch*2-this.Involute[i].y});
+        }
+
+		return invert_pts;
+	}
+
 
 	pitch_diameter( ){
 		return this.Module*this.NumTeeth;
@@ -156,10 +176,10 @@ class SimpleGear extends Gear {
 
 	}
 
-
 	generate_simple_gear(){
 
 		let pt;
+		var inline=[];
     	for( var i=0; i<this.NumTeeth; i++ ){
       		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
       		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
@@ -169,25 +189,27 @@ class SimpleGear extends Gear {
       			pt = this.rotate_point( {x:0,y:0}, {x:this.Involute[j].x, y:this.Involute[j].y }, theta );
 				this.Outline.push(pt);
 				tooth.push(pt);
-				if (j==0) this.Inline.push(pt);
+				if (j==0) inline.push(pt);
       		}
 
       		for( var j=this.Involute.length-1; j>=0; j-- ){
       			pt = this.rotate_point( {x:0,y:0}, {x: this.Involute[j].x, y:-this.Involute[j].y }, theta2 );
 				this.Outline.push(pt);
 				tooth.push(pt);
-				if (j==0) this.Inline.push(pt);
+				if (j==0) inline.push(pt);
       		}
 
 			this.Teeth.push(tooth);
     	}
+
+		this.Faces.push(inline);
 	}
 }
 
 class PlanetaryGear extends Gear {
     constructor(module, numTeeth, pressureAngle, outsideRadius) {
         super(module, numTeeth, pressureAngle);
-        this.OutsideRadius = outsideRadius;
+        this.OutsideRadius = this.Raddendum*module;
 
 		// these values were just used to build the teeth,
 		// this.Rpitch 
@@ -197,7 +219,37 @@ class PlanetaryGear extends Gear {
 		this.generate_planet_gear();
 	}
 
-	generate_simple_gear(){
+	generate_planet_gear(){
+
+		let pt;
+
+    	for( var i=0; i<this.NumTeeth; i++ ){
+      		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
+      		pt = this.rotate_point( {x:0,y:0}, {x:0, y:this.OutsideRadius }, theta );
+			this.Outline.push(pt);
+		}
+		
+    	for( var i=0; i<this.NumTeeth; i++ ){
+      		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
+      		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
+			var tooth=[];
+
+      		for( var j=0; j<this.InvertInvolute.length; j++ ){
+      			pt = this.rotate_point( {x:0,y:0}, {x:this.InvertInvolute[j].x, y:this.InvertInvolute[j].y }, theta );
+				this.InnerOutline.push(pt);
+				tooth.push(pt);
+//				if (j==0) this.Inline.push(pt);
+      		}
+
+      		for( var j=this.InvertInvolute.length-1; j>=0; j-- ){
+      			pt = this.rotate_point( {x:0,y:0}, {x: this.InvertInvolute[j].x, y:-this.Involute[j].y }, theta2 );
+				this.Outline.push(pt);
+				tooth.push(pt);
+	//			if (j==0) this.Inline.push(pt);
+      		}
+
+			this.Teeth.push(tooth);
+    	}
 	}
 }
 
