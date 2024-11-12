@@ -279,6 +279,61 @@ class EllipticalGear extends Gear {
 		this.generate_elliptical_gear();
 	}
 
+	normalVectorEllipse(a, b, theta) {
+		// Calculate the components of the normal vector at angle theta
+		const Nx = b * Math.cos(theta);
+		const Ny = a * Math.sin(theta);
+
+		// Calculate the magnitude of the normal vector
+		const magnitude = Math.sqrt(Nx * Nx + Ny * Ny);
+
+		// Normalize the normal vector to make it a unit vector
+		const unitNormal = {
+			x: Nx / magnitude,
+			y: Ny / magnitude
+		};
+
+		return unitNormal;
+	}
+
+	rotatePointAroundOriginWithNormal(point, normal) {
+		// Step 2: Rotate the point by this angle
+		const rotatedPoint = {
+			x: point.x * normal.x - point.y * normal.y,
+			y: point.x * normal.y + point.y * normal.x
+		};
+
+		return rotatedPoint;
+	}
+
+	rotate_point_to_ellipse(cen, pnt, theta) {
+		// Step 1: Calculate the reference point on the circle (Rpitch, 0)
+		const refCirclePoint = { x: this.Rpitch, y: 0 };
+
+		// Translate the input point relative to this reference circle point
+		const translatedPoint = {
+			x: pnt.x - cen.x - refCirclePoint.x,
+			y: pnt.y - cen.y - refCirclePoint.y,
+		};
+
+		// Step 2: Rotate the translated point by the normal vector direction
+		const normal = this.normalVectorEllipse(this.A, this.B, theta);
+		const rotatedPoint = this.rotatePointAroundOriginWithNormal(translatedPoint, normal);
+
+		// Step 3: Calculate the ellipse point at angle theta
+		const ellipsePoint = {
+			x: this.A * Math.cos(theta),
+			y: this.B * Math.sin(theta)
+		};
+
+		// Step 4: Translate the rotated point to the ellipse position at angle theta
+		const finalPoint = {
+			x: rotatedPoint.x + ellipsePoint.x + cen.x,
+			y: rotatedPoint.y + ellipsePoint.y + cen.y
+		};
+
+		return finalPoint;
+	}
 
 	generate_elliptical_gear() {
 
@@ -293,14 +348,14 @@ class EllipticalGear extends Gear {
 			var tooth = [];
 
 			for (var j = 0; j < this.Involute.length; j++) {
-				pt = rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: this.Involute[j].y }, theta, this.A, this.B, this.Rpitch);
+				pt = this.rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: this.Involute[j].y }, -theta);
 				outline.push(pt);
 				tooth.push(pt);
 				if (j == 0) inline.push(pt);
 			}
 
 			for (var j = this.Involute.length - 1; j >= 0; j--) {
-				pt = rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: -this.Involute[j].y }, theta2, this.A, this.B, this.Rpitch);
+				pt = this.rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[j].x, y: -this.Involute[j].y }, -theta2);
 				outline.push(pt);
 				tooth.push(pt);
 				if (j == 0) inline.push(pt);

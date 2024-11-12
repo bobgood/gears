@@ -56,7 +56,7 @@ function test(numTeeth=4) {
     extrudedMesh3 = extrudeAndAddToScene(pgear, extrusionDepth,0, 0xff77ff);
     extrudedMesh3.position.z = 5;
 
-    const egear = new EllipticalGear(module, numTeeth, pressureAngle, 0, .2);
+    const egear = new EllipticalGear(module, numTeeth, pressureAngle, 0, 0.00);
     scene.remove(extrudedMesh4);
     extrudedMesh4 = extrudeAndAddToScene(egear, extrusionDepth, 0, 0xffffff);
     extrudedMesh4.position.z = 10;
