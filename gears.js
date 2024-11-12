@@ -266,15 +266,16 @@ class PlanetaryGear extends Gear {
 
 class EllipticalGear extends Gear {
 	constructor(module, numTeeth, pressureAngle, shift, eccentricity) {
-		super(module, Math.max(8, numTeeth), shift, pressureAngle);
+		super(module, Math.max(8, numTeeth), 0, pressureAngle);
+		this.Shift = shift;
 		this.Eccentricity = eccentricity;
 		this.A = solveForSemiMajorAxis(Math.PI * 2 * this.Rpitch, this.Eccentricity, this.Rpitch);
 		this.B = this.A * Math.sqrt(1 - this.Eccentricity ** 2);
 		this.EllipseArcDistance = ellipseArcDistance(this.Eccentricity);
 		// these values were just used to build the teeth,
-		// this.Rpitch 
-		// this.Rbase 
-		// this.Rdedendum 
+		// this.Rpitch
+		// this.Rbase
+		// this.Rdedendum
 		// this.Raddendum 
 		this.generate_elliptical_gear();
 	}
@@ -341,9 +342,9 @@ class EllipticalGear extends Gear {
 		var inline = [];
 		var outline = [];
 		for (var i = 0; i < this.NumTeeth; i++) {
-			var ctheta = i * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+			var ctheta = (i+this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
 			var theta = circleThetaToElipse(ctheta, this.EllipseArcDistance);
-			var ctheta2 = i * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+			var ctheta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
 			var theta2 = circleThetaToElipse(ctheta2, this.EllipseArcDistance);
 			var tooth = [];
 

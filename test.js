@@ -15,7 +15,7 @@ directionalLight.position.set(5, 5, 10); // Position the light above and to the 
 scene.add(directionalLight);
 
 // Variables to store both extruded meshes for rotation
-let extrudedMesh1= null, extrudedMesh2=null, extrudedMesh3=null, extrudedMesh4=null;
+let extrudedMesh1 = null, extrudedMesh2 = null, extrudedMesh3 = null, extrudedMesh4 = null, extrudedMesh5 = null;
 const pitchRadius = 5;
 
 // Function to instantiate and add an extruded mesh to the scene
@@ -38,28 +38,34 @@ function extrudeAndAddToScene(shape, extrusionDepth, offsetX = 0, col) {
 
 let outline, faces, teeth;
 // Test function to generate the gear shape
-function test(numTeeth=4) {
+function test(numTeeth=4, shift=0,eccentricity=0) {
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
-    const gear = new SimpleGear(module, numTeeth, pressureAngle, 0);
+    const gear = new SimpleGear(module, numTeeth, pressureAngle, shift);
     const extrusionDepth = 2;
     scene.remove(extrudedMesh1);
-    extrudedMesh1 = extrudeAndAddToScene(gear, extrusionDepth,0, 0x0077ff);
+    extrudedMesh1 = extrudeAndAddToScene(gear, extrusionDepth,shift, 0x0077ff);
 
     // Extrude and add the second gear, offset to the right by the pitchRadius * 2
     scene.remove(extrudedMesh2);
     extrudedMesh2 = extrudeAndAddToScene(gear, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
 
-    const pgear = new PlanetaryGear(module, numTeeth, pressureAngle,0);
+    const pgear = new PlanetaryGear(module, numTeeth, pressureAngle,shift);
     scene.remove(extrudedMesh3);
     extrudedMesh3 = extrudeAndAddToScene(pgear, extrusionDepth,0, 0xff77ff);
     extrudedMesh3.position.z = 5;
 
-    const egear = new EllipticalGear(module, numTeeth, pressureAngle, 0, 0.00);
+    const egear = new EllipticalGear(module, numTeeth, pressureAngle, shift, eccentricity);
     scene.remove(extrudedMesh4);
-    extrudedMesh4 = extrudeAndAddToScene(egear, extrusionDepth, 0, 0xffffff);
+    extrudedMesh4 = extrudeAndAddToScene(egear, extrusionDepth, -(egear.A+egear.B)/2, 0xffffff);
     extrudedMesh4.position.z = 10;
+
+    const egear2 = new EllipticalGear(module, numTeeth, pressureAngle, shift + .5, eccentricity);
+    scene.remove(extrudedMesh5);
+    extrudedMesh5 = extrudeAndAddToScene(egear2, extrusionDepth, (egear.A + egear.B) / 2, 0xffff00);
+    extrudedMesh5.position.z = 10;
+    extrudedMesh5.rotation.z = Math.PI/2;
 
 }
 
@@ -100,7 +106,7 @@ function animate() {
     const value6 = slider6.value;
     sliderValueDisplay6.textContent = value6;
 
-    test(value6)
+    test(value6,(value2-50)/50, value3/100)
     
     // Rotate both extruded meshes if they exist
     if (extrudedMesh1) {
@@ -115,6 +121,18 @@ function animate() {
     if (extrudedMesh2) {
         extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
          extrudedMesh2.rotation.z = rot2-Math.PI*value1/200; // Rotate around z-axis
+
+    }
+    if (extrudedMesh3) {
+        extrudedMesh3.rotation.z = Math.PI * value1 / 200; // Rotate around z-axis
+
+    }
+    if (extrudedMesh4) {
+        extrudedMesh4.rotation.z = Math.PI * value1 / 200; // Rotate around z-axis
+
+    }
+    if (extrudedMesh5) {
+        extrudedMesh5.rotation.z = Math.PI/2-Math.PI * value1 / 200; // Rotate around z-axis
 
     }
 
