@@ -41,8 +41,13 @@ class Gear {
 		// calculates the coordinates of the involute curve
 		this.Involute=this.create_involute_coordinates();
 
+		console.log(this.Involute);
+		console.log();
+
 		// upside down for planetary
 		this.InvertInvolute = this.create_invert_involute_coordinates();
+		console.log(this.InvertInvolute);
+		console.log();
     }
 
 	point_radius( pnt ){
@@ -140,7 +145,7 @@ class Gear {
 	{
 		var invert_pts = [];
 		for(var i=0; i<this.Involute.length; i++){
-            invert_pts.push({x:this.Involute[i].x, y:this.Rpitch*2-this.Involute[i].y});
+            invert_pts.push({x:this.Rpitch*2-this.Involute[i].x, y:this.Involute[i].y});
         }
 
 		return invert_pts;
@@ -207,9 +212,9 @@ class SimpleGear extends Gear {
 }
 
 class PlanetaryGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, outsideRadius) {
-        super(module, numTeeth, pressureAngle);
-        this.OutsideRadius = this.Raddendum*module;
+    constructor(module, numTeeth, pressureAngle, outsideRadius=0) {
+        super(module, Math.max(20,numTeeth), pressureAngle);
+		this.OutsideRadius = Math.max(outsideRadius,this.Raddendum+1*module)
 
 		// these values were just used to build the teeth,
 		// this.Rpitch 
@@ -221,34 +226,49 @@ class PlanetaryGear extends Gear {
 
 	generate_planet_gear(){
 
-		let pt;
+		let pt,pt3;
 
-    	for( var i=0; i<this.NumTeeth; i++ ){
-      		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
-      		pt = this.rotate_point( {x:0,y:0}, {x:0, y:this.OutsideRadius }, theta );
-			this.Outline.push(pt);
-		}
 		
     	for( var i=0; i<this.NumTeeth; i++ ){
       		var theta = i*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
       		var theta2 = i*Math.PI*2.0/(this.NumTeeth)-this.theta_cross+this.dtheta/2;
+      		var theta3 = (i+1)*Math.PI*2.0/(this.NumTeeth)+this.theta_cross-this.dtheta/2;
+      		var opt = this.rotate_point( {x:0,y:0}, {x:this.OutsideRadius, y:0 }, theta );
+      		var opt3 = this.rotate_point( {x:0,y:0}, {x:this.OutsideRadius, y:0 }, theta3 );
+			this.Outline.push(opt);
+
 			var tooth=[];
+			var face=[];
 
       		for( var j=0; j<this.InvertInvolute.length; j++ ){
       			pt = this.rotate_point( {x:0,y:0}, {x:this.InvertInvolute[j].x, y:this.InvertInvolute[j].y }, theta );
 				this.InnerOutline.push(pt);
 				tooth.push(pt);
-//				if (j==0) this.Inline.push(pt);
+				if (j==0)
+				{ 
+	      			pt3 = this.rotate_point( {x:0,y:0}, {x:this.InvertInvolute[j].x, y:this.InvertInvolute[j].y }, theta3 );
+					face.push(pt);
+				}
       		}
 
       		for( var j=this.InvertInvolute.length-1; j>=0; j-- ){
       			pt = this.rotate_point( {x:0,y:0}, {x: this.InvertInvolute[j].x, y:-this.Involute[j].y }, theta2 );
 				this.Outline.push(pt);
 				tooth.push(pt);
-	//			if (j==0) this.Inline.push(pt);
+				if (j==0) face.push(pt);
       		}
-
+			
+			// 0 and 2 are the same
+			// 3 and 4 are the same
+			face.push(pt3);
+			face.push(opt3);
+			face.push(opt);
+			console.log(face);
+			console.log();
+			this.Faces.push(face);
 			this.Teeth.push(tooth);
+			console.log(tooth);
+			console.log();
     	}
 	}
 }

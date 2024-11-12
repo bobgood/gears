@@ -48,11 +48,11 @@ class Extrude {
     }
 
     extrudeShape(outline, faces, teeth, depth) {
-        // Extrude the sides based on the outline shape
-        for (let i = 0; i < outline.length; i++) {
-            const i2 = (i + 1) % outline.length;
-            this.addEdgeQuad(outline[i], outline[i2], depth);
-        }
+//        // Extrude the sides based on the outline shape
+//        for (let i = 0; i < outline.length; i++) {
+//            const i2 = (i + 1) % outline.length;
+//            this.addEdgeQuad(outline[i], outline[i2], depth);
+//        }
 
         // Add front and back faces for the `teeth` and `inline` shapes
         for (let i = 0; i < teeth.length; i++) {
