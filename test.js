@@ -43,7 +43,18 @@ function extrudeAndAddToScene(shape, extrusionDepth, offsetX = 0, col) {
 
 let outline, faces, teeth;
 // Test function to generate the gear shape
-function test(numTeeth=4, shift=0,eccentricity=0) {
+let lastNumTeeth = 0;
+let lastShift = 0;
+let lastEccentricity = 0;
+function build(numTeeth = 4, shift = 0, eccentricity = 0) {
+    if (numTeeth === lastNumTeeth && shift === lastShift && eccentricity === lastEccentricity) {
+        return;
+    };
+
+    lastNumTeeth = numTeeth;
+    lastShift = shift;
+    lastEccentricity = eccentricity;
+
     const pressureAngle = 20 * Math.PI / 180;
     const module = 1;
 
@@ -74,9 +85,6 @@ function test(numTeeth=4, shift=0,eccentricity=0) {
 
 }
 
-
-// Run the test function to add the extruded shapes to the scene
-test();
 
 // Position the camera to view both shapes
 camera.position.set(15, 15, 20); // Adjusted to see both objects
@@ -138,8 +146,12 @@ function animate() {
     panX = -valueB2;
     panY = -valueB3;
     rotationY = -valueB4*Math.PI/180;
+    gearRot = valueB5 *Math.PI/180;
 
-    test(value6,(value2-50)/50, value3/100)
+    toothCount = value6;
+    toothShift = (value2 - 50) / 50;
+    eccentricity = value3 / 100;
+    build(toothCount, toothShift, eccentricity)
     
     // Rotate both extruded meshes if they exist
     if (extrudedMesh1) {
@@ -149,23 +161,23 @@ function animate() {
         var rot2=Math.PI/value6+Math.PI;
 
 //        // Use the slider value in your three.js code, e.g., to change cube rotation speed
-          extrudedMesh1.rotation.z = Math.PI*value1/200; // Rotate around z-axis
+          extrudedMesh1.rotation.z = gearRot; // Rotate around z-axis
     }
     if (extrudedMesh2) {
         extrudedMesh2.rotation.z -= 0.01; // Rotate around z-axis
-         extrudedMesh2.rotation.z = rot2-Math.PI*value1/200; // Rotate around z-axis
+         extrudedMesh2.rotation.z = rot2-gearRot; // Rotate around z-axis
 
     }
     if (extrudedMesh3) {
-        extrudedMesh3.rotation.z = Math.PI * value1 / 200; // Rotate around z-axis
+        extrudedMesh3.rotation.z = gearRot; // Rotate around z-axis
 
     }
     if (extrudedMesh4) {
-        extrudedMesh4.rotation.z = Math.PI * value1 / 200; // Rotate around z-axis
+        extrudedMesh4.rotation.z = gearRot; // Rotate around z-axis
 
     }
     if (extrudedMesh5) {
-        extrudedMesh5.rotation.z = Math.PI/2-Math.PI * value1 / 200; // Rotate around z-axis
+        extrudedMesh5.rotation.z = Math.PI / 2 - gearRot; // Rotate around z-axis
 
     }
 
