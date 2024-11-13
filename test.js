@@ -4,6 +4,11 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+let zoom = 50;         // Initial zoom (distance from the scene along Z-axis)
+let panX = 0;          // Horizontal pan
+let panY = 0;          // Vertical pan
+let rotationY = 0;     // Rotation around the Y-axis
+
 
 // Add ambient light (soft, all-directional light)
 const ambientLight = new THREE.AmbientLight(0x404040, 1); // Color and intensity
@@ -89,22 +94,50 @@ const slider5 = document.getElementById('mySlider5');
 const sliderValueDisplay5 = document.getElementById('sliderValue5');
 const slider6 = document.getElementById('mySlider6');
 const sliderValueDisplay6 = document.getElementById('sliderValue6');
+const sliderB1 = document.getElementById('mySliderB1');
+const sliderValueDisplayB1 = document.getElementById('sliderValueB1');
+const sliderB2 = document.getElementById('mySliderB2');
+const sliderValueDisplayB2 = document.getElementById('sliderValueB2');
+const sliderB3 = document.getElementById('mySliderB3');
+const sliderValueDisplayB3 = document.getElementById('sliderValueB3');
+const sliderB4 = document.getElementById('mySliderB4');
+const sliderValueDisplayB4 = document.getElementById('sliderValueB4');
+const sliderB5 = document.getElementById('mySliderB5');
+const sliderValueDisplayB5 = document.getElementById('sliderValueB5');
+const sliderB6 = document.getElementById('mySliderB6');
+const sliderValueDisplayB6 = document.getElementById('sliderValueB6');
 
 // Animation loop to render the scene
 function animate() {
     requestAnimationFrame(animate);
-    const value1 = slider1.value;
+    const value1 = Number(slider1.value);
     sliderValueDisplay1.textContent = value1;
-    const value2 = slider2.value;
+    const value2 = Number(slider2.value);
     sliderValueDisplay2.textContent = value2;
-    const value3 = slider3.value;
+    const value3 = Number(slider3.value);
     sliderValueDisplay3.textContent = value3;
-    const value4 = slider4.value;
+    const value4 = Number(slider4.value);
     sliderValueDisplay4.textContent = value4;
-    const value5 = slider5.value;
+    const value5 = Number(slider5.value);
     sliderValueDisplay5.textContent = value5;
-    const value6 = slider6.value;
+    const value6 = Number(slider6.value);
     sliderValueDisplay6.textContent = value6;
+    const valueB1 = Number(sliderB1.value);
+    sliderValueDisplayB1.textContent = valueB1;
+    const valueB2 = Number(sliderB2.value);
+    sliderValueDisplayB2.textContent = valueB2;
+    const valueB3 = Number(sliderB3.value);
+    sliderValueDisplayB3.textContent = valueB3;
+    const valueB4 = Number(sliderB4.value);
+    sliderValueDisplayB4.textContent = valueB4;
+    const valueB5 = Number(sliderB5.value);
+    sliderValueDisplayB5.textContent = valueB5;
+    const valueB6 = Number(sliderB6.value);
+    sliderValueDisplayB6.textContent = valueB6;
+    zoom = valueB1;
+    panX = -valueB2;
+    panY = -valueB3;
+    rotationY = -valueB4*Math.PI/180;
 
     test(value6,(value2-50)/50, value3/100)
     
@@ -135,6 +168,16 @@ function animate() {
         extrudedMesh5.rotation.z = Math.PI/2-Math.PI * value1 / 200; // Rotate around z-axis
 
     }
+
+    var cx = panX + zoom * Math.sin(rotationY);
+    var cz = zoom * Math.cos(rotationY);
+//    camera.position.set(panX, panY, zoom);
+//    directionalLight.position.set(panX, panY, zoom); // Position the light above and to the side
+
+    camera.position.set(cx, panY, cz);
+    directionalLight.position.set(cx,panY,cz); // Position the light above and to the side
+
+    camera.lookAt(new THREE.Vector3(panX, panY, 0)); // Keep looking toward the scene center
 
     renderer.render(scene, camera);
 }

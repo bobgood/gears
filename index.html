@@ -25,6 +25,26 @@
           display: flex;
           flex-direction: column;
         }
+        .slider-container2 {
+          position: absolute;
+          top: 100px;
+          right: 10px;
+          transform: translateY(-50%);
+          z-index: 10;
+          background: rgba(255, 255, 255, 0.8);
+          padding: 10px;
+          border-radius: 5px;
+          display: flex;
+          flex-direction: column;
+        }
+        .fixed-label {
+          display: inline-block;
+          width: 100px;
+        }
+        .fixed-num {
+          display: inline-block;
+          width: 20px;
+        }
 
         /* Style for the three.js canvas */
         body, html {
@@ -45,29 +65,56 @@
   <!-- Slider container -->
   <div class="slider-container">
     <div>
-        <label for="mySlider1">RotateX:</label>
+        <label for="mySlider1" class="fixed-label">RotateX:</label>
         <input type="range" id="mySlider1" min="0" max="100" value="50">
-        <span id="sliderValue1">50</span>
+        <span id="sliderValue1" class="fixed-num">50</span>
     </div><div>
-        <label for="mySlider2">Tooth Shift:</label>
+        <label for="mySlider2" class="fixed-label">Tooth Shift:</label>
         <input type="range" id="mySlider2" min="0" max="100" value="50">
         <span id="sliderValue2">50</span>
     </div><div>
-        <label for="mySlider3">Eccentricity:</label>
+        <label for="mySlider3" class="fixed-label">Eccentricity:</label>
         <input type="range" id="mySlider3" min="0" max="100" value="50">
         <span id="sliderValue3">50</span>
     </div><div>
-        <label for="mySlider4">Unused:</label>
+        <label for="mySlider4" class="fixed-label">Unused:</label>
         <input type="range" id="mySlider4" min="0" max="100" value="50">
         <span id="sliderValue4">50</span>
     </div><div>
-        <label for="mySlider5">Unused:</label>
+        <label for="mySlider5" class="fixed-label">Unused:</label>
         <input type="range" id="mySlider5" min="0" max="100" value="50">
         <span id="sliderValue5">50</span>
     </div><div>
-        <label for="mySlider6">teeth count:</label>
+        <label for="mySlider6" class="fixed-label">teeth count:</label>
         <input type="range" id="mySlider6" min="0" max="100" value="12">
         <span id="sliderValue6">12</span>
+      </div>
+  </div>
+  <div class="slider-container2">
+    <div>
+        <label for="mySliderB1" class="fixed-label">zoom:</label>
+        <input type="range" id="mySliderB1" min="10" max="200" value="50">
+        <span id="sliderValueB1" class="fixed-num">50</span>
+    </div><div>
+        <label for="mySliderB2" class="fixed-label">PanX:</label>
+        <input type="range" id="mySliderB2" min="-100" max="100" value="0">
+        <span id="sliderValueB2">0</span>
+    </div><div>
+        <label for="mySliderB3" class="fixed-label">PanY:</label>
+        <input type="range" id="mySliderB3" min="-100" max="100" value="0">
+        <span id="sliderValueB3">0</span>
+    </div><div>
+        <label for="mySliderB4" class="fixed-label">RotationY:</label>
+        <input type="range" id="mySliderB4" min="-180" max="180" value="0">
+        <span id="sliderValueB4">0</span>
+    </div><div>
+        <label for="mySliderB5" class="fixed-label">Unused:</label>
+        <input type="range" id="mySliderB5" min="0" max="100" value="50">
+        <span id="sliderValueB5">50</span>
+    </div><div>
+        <label for="mySliderB6" class="fixed-label">Unused:</label>
+        <input type="range" id="mySliderB6" min="0" max="100" value="12">
+        <span id="sliderValueB6">12</span>
       </div>
   </div>
 
