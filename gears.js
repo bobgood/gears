@@ -205,10 +205,10 @@ class SimpleGear extends Gear {
         let pt;
         var outline = [];
         for (var i = 0; i < this.NumTeeth; i++) {
-            var inline = [{ x: 0, y:0}];
+            var inline = [{ x: 0, y: 0 }];
             var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
             var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
-            var theta3 = (i+1 + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta3 = (i + 1 + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
             var tooth = [];
 
             for (var j = 0; j < this.Involute.length; j++) {
@@ -234,6 +234,118 @@ class SimpleGear extends Gear {
 
         this.Outlines.push(outline);
     }
+}
+class FrameGear extends Gear {
+    constructor(module, numTeeth, pressureAngle, shift, frameRadius, numSegments, frameShift, holeRadius, N=20) { 
+        super(module, Math.max(20,numTeeth), pressureAngle, shift);
+        this.FrameRadius = frameRadius;
+        this.NumSegments = Math.min(4,numSegments);
+        this.FrameShift = frameShift;
+        this.HoleRadius = holeRadius;
+        this.N = N;
+        this.map_meetpoints();
+        this.generate_frame_gear();
+    }
+
+    meet_distance(meet, tooth) {
+        var omega = meet * Math.PI / this.NumSegments + this.FrameShift * Math.PI * 2 / this.NumTeeth;
+        var theta = tooth * 2 * Math.PI / this.NumTeeth + this.Shift * Math.PI * 2 / this.NumTeeth
+        var diff = omega - theta;
+        while (diff <= -Math.PI) diff += 2 * Math.PI;
+        while (diff >= Math.PI) diff -= 2 * Math.PI;
+        return Math.abs(diff);        
+    }
+
+    map_meetpoints() 
+    {
+        this.meets = [];
+        for (var i = 0; i < this.NumSegments*2; i++) {
+            var omega = i * Math.PI / this.NumSegments + this.FrameShift * Math.PI * 2 / this.NumTeeth;
+            this.meets.push(this.rotate_point({ x: 0, y: 0 }, { x: this.FrameRadius, y: 0 }, omega));
+        }
+
+        this.meets_map = [];
+        for (var i = 0; i < this.NumTeeth; i++) {
+            var max = 10;
+            var max_j = -1;
+            for (var j = 0; j < this.NumSegments*2; j++) {
+                var dist = this.meet_distance(j, i);
+                if (dist < max) {
+                    max = dist; max_j = j;
+                }
+            }
+            this.meets_map.push([max_j, -1, max]);
+        }
+
+        // find the teeth that are furthest from a hole
+        for (var i = 0; i < this.NumTeeth; i++) {
+            var i2 = (i + 1) % this.NumTeeth;
+            if (this.meets_map[i][0] != this.meets_map[i2][0])
+            {
+                if (this.meets_map[i][2] > this.meets_map[i2][2]) {
+                    // set this as an alt triangle.
+                    this.meets_map[i][1] = this.meets_map[i2][0];
+                    this.meets_map[i2][1] = -2;
+                } else {
+                    this.meets_map[i2][1] = this.meets_map[i2][0];
+                    this.meets_map[i2][0] = this.meets_map[i][0];
+                    this.meets_map[i][1] = -3;
+                }
+            }
+        }
+    }
+
+    generate_frame_gear() {
+
+        let pt;
+        var outline = [];
+        for (var i = 0; i < this.NumTeeth; i++) {
+            var meet_pt = this.meets[this.meets_map[i][0]];
+            var inline = [meet_pt];
+            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+            var theta3 = (i + 1 + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var tooth = [];
+
+            for (var j = 0; j < this.Involute.length; j++) {
+                pt = this.rotate_point({ x: 0, y: 0 }, { x: this.Involute[j].x, y: this.Involute[j].y }, theta);
+                outline.push(pt);
+                tooth.push(pt);
+                if (j == 0) inline.push(pt);
+            }
+
+            for (var j = this.Involute.length - 1; j >= 0; j--) {
+                pt = this.rotate_point({ x: 0, y: 0 }, { x: this.Involute[j].x, y: -this.Involute[j].y }, theta2);
+                outline.push(pt);
+                tooth.push(pt);
+                if (j == 0) inline.push(pt);
+            }
+
+            var pt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.Involute[0].x, y: this.Involute[0].y }, theta3);
+            inline.push(pt3);
+
+            this.Faces.push(inline);
+            var alt = this.meets_map[i][1];
+            if (alt >= 0) {
+                var sideline = [meet_pt, this.meets[alt], pt3];
+                this.Faces.push(sideline);
+
+            }
+
+            this.Faces.push(tooth);
+        }
+
+        var center = { x: 0, y: 0 };
+        for (j = 0; j < this.NumSegments * 2; j++) {
+            var j2 = (j + 1) % (this.NumSegments * 2);
+            var inner = [center, this.meets[j], this.meets[j2]];
+            this.Faces.push(inner);
+        }
+
+        this.Outlines.push(outline);
+    }
+
+
 }
 
 class PlanetaryGear extends Gear {
@@ -434,7 +546,7 @@ class EllipticalGear extends Gear {
     }
 }
 
-class FrameGear extends Shape2D {
+class Frame extends Shape2D {
     constructor(radius, width, segments,hole_radius, shift=0, N = 200) {
         super();
         this.Radius = radius;
@@ -443,7 +555,7 @@ class FrameGear extends Shape2D {
         this.Segments = segments;
         this.N = Math.round(N / segments);
         this.Shift = shift;
-        this.generate_frame_gear();
+        this.generate_frame();
         if (this.HoleRadius * 2 >= this.Width) {
             this.HoleRadius = this.Width / 3;
         }
@@ -463,7 +575,7 @@ class FrameGear extends Shape2D {
         return pt;
     }
 
-    generate_frame_gear() {
+    generate_frame() {
         var outline = [];
         var cutLine = [];
         var ptc ={ x:0, y: 0}
