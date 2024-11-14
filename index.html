@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antikythera Mechanism</title>
     <!-- Link to the Three.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/clipper-lib@6.4.2/clipper.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/earcut@2.2.2/dist/earcut.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/clipper-lib@6.4.2/clipper.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/earcut@2.2.2/dist/earcut.min.js"></script>
     <!-- Link to your custom JavaScript file -->
-    <script defer src="extrude.js"></script>
-    <script defer src="ellipse_math.js"></script>
-    <script defer src="gears.js"></script>
-    <script defer src="test.js"></script>
-     <style>
+    <script>
+        const version = new Date().getTime(); // Use current timestamp
+        document.write(`<script defer src="extrude.js?v=${version}"><\/script>`);
+        document.write(`<script defer src="ellipse_math.js?v=${version}"><\/script>`);
+        document.write(`<script defer src="gears.js?v=${version}"><\/script>`);
+        document.write(`<script defer src="test.js?v=${version}"><\/script>`);
+    </script>
+    <style>
         /* Style for the slider */
         .slider-container {
           position: absolute;
