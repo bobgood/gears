@@ -7,30 +7,6 @@ class Shape2D {
         // post processing holes and  otches
         this.Cuts = [];
     }
-
-    drill(x, y, r, N = 200) {
-        if (this.Outlines.length != 1) {
-            throw "cannot "
-        }
-        var points = [];
-        for (var i = 0; i < N; i++) {
-            var theta = i * Math.PI * 2.0 / 20.0;
-            points.push({ x: x + r * Math.cos(theta), y: y + r * Math.sin(theta) });
-        }
-        this.Cuts.push(points);
-    }
-
-    mill(w, r1, r2) {
-        if (this.Outlines.length != 1) {
-            throw "cannot drill into hollow gear"
-        }
-
-        var points = [];
-        points.push({ x: r1, y: w / 2 });
-        points.push({ x: r2, y: w / 2 });
-        points.push({ x: r2, y: -w / 2 });
-        points.push({ x: r1, y: -w / 2 });
-    }
 }
 class Gear extends Shape2D {
     constructor(module, numTeeth, pressureAngle, shift) {
@@ -38,6 +14,8 @@ class Gear extends Shape2D {
         this.Module = module;
         this.NumTeeth = numTeeth;
         this.PressureAngle = pressureAngle;
+
+        // shift the zero angle of the gear by shift teeth distances
         this.Shift = shift;
 
         // Rp aka r pitch
@@ -66,6 +44,30 @@ class Gear extends Shape2D {
 
         // upside down for planetary
         this.InvertInvolute = this.create_invert_involute_coordinates();
+    }
+
+
+    slot(r, w = 0, r2 = 0, slot_shift=0, N = 200) {
+        if (this.Outlines.length != 1) {
+            throw "cannot "
+        }
+
+        var wangle = Math.asin(w / r / 2);
+        var tshift = slot_shift * Math.PI * 2 / this.NumTeeth;
+        var r2a= Math.sqrt(r2*r2+w*w/4);
+        var wangle2 = Math.asin(w / r2a / 2);
+        var points = [];
+        for (var i = 0; i <= N; i++) {
+            var theta = i* (Math.PI * 2.0 - wangle * 2) / N + wangle + tshift;
+            points.push({ x: r * Math.cos(theta), y: r * Math.sin(theta) });
+        }
+
+        for (var i = N; i >= 0; i -= N) {
+            var theta = i * (Math.PI * 2.0 - wangle2 * 2) / N + wangle2 + tshift;
+            points.push({ x: r2a * Math.cos(theta), y: r2a * Math.sin(theta) });
+        }
+
+        this.Cuts.push(points);
     }
 
     point_radius(pnt) {
@@ -201,11 +203,12 @@ class SimpleGear extends Gear {
     generate_simple_gear() {
 
         let pt;
-        var inline = [];
         var outline = [];
         for (var i = 0; i < this.NumTeeth; i++) {
+            var inline = [{ x: 0, y:0}];
             var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
             var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+            var theta3 = (i+1 + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
             var tooth = [];
 
             for (var j = 0; j < this.Involute.length; j++) {
@@ -222,10 +225,13 @@ class SimpleGear extends Gear {
                 if (j == 0) inline.push(pt);
             }
 
+            var pt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.Involute[0].x, y: this.Involute[0].y }, theta3);
+            inline.push(pt3);
+
+            this.Faces.push(inline);
             this.Faces.push(tooth);
         }
 
-        this.Faces.push(inline);
         this.Outlines.push(outline);
     }
 }
@@ -393,13 +399,15 @@ class EllipticalGear extends Gear {
     generate_elliptical_gear() {
 
         let pt;
-        var inline = [];
         var outline = [];
         for (var i = 0; i < this.NumTeeth; i++) {
+            var inline = [{ x: 0, y: 0 }];
             var ctheta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
             var theta = this.convert_circle_angle_to_ellipse(ctheta);
             var ctheta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
             var theta2 = this.convert_circle_angle_to_ellipse(ctheta2);
+            var ctheta3 = (i +1+ this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta3 = this.convert_circle_angle_to_ellipse(ctheta3);
             var tooth = [];
 
             for (var j = 0; j < this.Involute.length; j++) {
@@ -416,10 +424,12 @@ class EllipticalGear extends Gear {
                 if (j == 0) inline.push(pt);
             }
 
+            var pt3 = this.rotate_point_to_ellipse({ x: 0, y: 0 }, { x: this.Involute[0].x, y: this.Involute[0].y }, -theta3);
+            inline.push(pt3);
+            this.Faces.push(inline);
             this.Faces.push(tooth);
         }
 
-        this.Faces.push(inline);
         this.Outlines.push(outline);
     }
 }
