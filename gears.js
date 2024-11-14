@@ -236,12 +236,16 @@ class SimpleGear extends Gear {
     }
 }
 class FrameGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, shift, frameRadius, numSegments, frameShift, holeRadius, N=20) { 
+    constructor(module, numTeeth, pressureAngle, shift, frameRadius, numSegments, frameShift, holeRadius, tolerance=0,N=20) { 
         super(module, Math.max(20,numTeeth), pressureAngle, shift);
         this.FrameRadius = frameRadius;
         this.NumSegments = Math.min(4,numSegments);
         this.FrameShift = frameShift;
         this.HoleRadius = holeRadius;
+        this.Tolerance = tolerance;
+        if (tolerance == 0) {
+            this.Tolerance = holeRadius;
+        }
         this.N = N;
         this.map_meetpoints();
         this.generate_frame_gear();
@@ -259,9 +263,15 @@ class FrameGear extends Gear {
     map_meetpoints() 
     {
         this.meets = [];
+        this.inner_meets = [];
+        this.meets_angle = [];
         for (var i = 0; i < this.NumSegments*2; i++) {
             var omega = i * Math.PI / this.NumSegments + this.FrameShift * Math.PI * 2 / this.NumTeeth;
+            this.meets_angle.push(omega);
             this.meets.push(this.rotate_point({ x: 0, y: 0 }, { x: this.FrameRadius, y: 0 }, omega));
+            if (i % 2 == 0) {
+                this.inner_meets.push(this.rotate_point({ x: 0, y: 0 }, { x: this.FrameRadius - this.HoleRadius - this.Tolerance, y: 0 }, omega));
+            }
         }
 
         this.meets_map = [];
@@ -342,6 +352,38 @@ class FrameGear extends Gear {
             this.Faces.push(inner);
         }
 
+        for (j = 0; j < this.NumSegments; j++) {
+            var hole_center = this.meets[j * 2];
+
+            var circle = [];
+
+            for (var k = 0; k < this.N; k++) {
+                var x1 = hole_center.x + this.HoleRadius * Math.cos(k * Math.PI * 2 / this.N);
+                var y1 = hole_center.y + this.HoleRadius * Math.sin(k * Math.PI * 2 / this.N);
+
+                pt = { x: x1, y:y1 };
+                circle.push(pt);
+            }
+            this.Cuts.push(circle);
+            var j2 = (j + 1) % this.NumSegments;
+
+            var r1 = this.FrameRadius + this.HoleRadius + this.Tolerance;
+            var r2 = this.Rdedendum - this.Tolerance;
+            var d_ang1 = Math.asin((this.HoleRadius / 2 + this.Tolerance) / r1);
+            var d_ang2 = Math.asin((this.HoleRadius / 2 + this.Tolerance) / r2);
+            var angA = this.meets_angle[j * 2];
+            var angB = this.meets_angle[j2 * 2];
+
+            var cutout = [];
+            cutout.push(this.rotate_point({ x: 0, y: 0 }, { x: r1, y: 0 }, angB - d_ang1));
+            cutout.push(this.rotate_point({ x: 0, y: 0 }, { x: r1, y: 0 }, angA + d_ang1));
+            cutout.push(this.rotate_point({ x: 0, y: 0 }, { x: r2, y: 0 }, angA + d_ang2));
+            cutout.push(this.rotate_point({ x: 0, y: 0 }, { x: r2, y: 0 }, angB - d_ang2));
+            this.Cuts.push(cutout);
+
+        }
+
+        this.Cuts.push(this.inner_meets);
         this.Outlines.push(outline);
     }
 
