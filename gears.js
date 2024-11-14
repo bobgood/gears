@@ -237,7 +237,7 @@ class SimpleGear extends Gear {
 }
 class FrameGear extends Gear {
     constructor(module, numTeeth, pressureAngle, shift, frameRadius, numSegments, frameShift, holeRadius, tolerance=0,N=20) { 
-        super(module, Math.max(20,numTeeth), pressureAngle, shift);
+        super(module, Math.max(24,numTeeth), pressureAngle, shift);
         this.FrameRadius = frameRadius;
         this.NumSegments = Math.min(4,numSegments);
         this.FrameShift = frameShift;
