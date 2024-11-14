@@ -49,7 +49,25 @@ function ellipseArcDistance(e) {
 	return tot_dist;
 }
 
-function circleThetaToElipse(ctheta, tot_dist) {
+function ellipseThetaToCircle(etheta, tot_dist) {
+	var diff = 0;
+	while (etheta - diff > 2 * Math.PI) {
+		diff += 2 * Math.PI;
+	}
+	while (etheta - diff < 0) {
+		diff -= 2 * Math.PI;
+	}
+
+
+	f = (etheta-diff) * G / (Math.PI * 2);
+	f0 = Math.floor(f);
+	f1 = Math.ceil(f);
+	ff = f - f0;
+	ctheta = tot_dist[f0] * (1 - ff) + tot_dist[f1] * ff;
+	return ctheta;
+}
+
+function circleThetaToEllipse(ctheta, tot_dist) {
 	var diff = 0;
 	while (ctheta-diff > 2 * Math.PI) {
 		diff+= 2*Math.PI;

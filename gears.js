@@ -266,7 +266,7 @@ class PlanetaryGear extends Gear {
 
 class EllipticalGear extends Gear {
 	constructor(module, numTeeth, pressureAngle, shift, eccentricity) {
-		super(module, Math.max(8, numTeeth), 0, pressureAngle);
+		super(module, Math.max(4 * Math.floor(numTeeth / 4, 8)), 0, pressureAngle);
 		this.Shift = shift;
 		this.Eccentricity = eccentricity;
 		this.A = solveForSemiMajorAxis(Math.PI * 2 * this.Rpitch, this.Eccentricity, this.Rpitch);
@@ -336,6 +336,23 @@ class EllipticalGear extends Gear {
 		return finalPoint;
 	}
 
+	// converts an 
+	convert_angle_to_ellipse_pair(ctheta1) {
+		var etheta1 = this.convert_circle_angle_to_ellipse(ctheta1);
+		var etheta2 = Math.PI / 2 - etheta1;
+		var ctheta2 = this.convert_ellipse_angle_to_circle(etheta2);
+		return ctheta2;
+	}
+
+	convert_ellipse_angle_to_circle(ctheta) {
+		var etheta = ellipseThetaToCircle(ctheta, this.EllipseArcDistance);
+		return etheta;
+	}
+
+	convert_circle_angle_to_ellipse(theta) {
+		return circleThetaToEllipse(theta, this.EllipseArcDistance);
+	}
+
 	generate_elliptical_gear() {
 
 		let pt;
@@ -343,9 +360,9 @@ class EllipticalGear extends Gear {
 		var outline = [];
 		for (var i = 0; i < this.NumTeeth; i++) {
 			var ctheta = (i+this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
-			var theta = circleThetaToElipse(ctheta, this.EllipseArcDistance);
+			var theta = this.convert_circle_angle_to_ellipse(ctheta);
 			var ctheta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
-			var theta2 = circleThetaToElipse(ctheta2, this.EllipseArcDistance);
+			var theta2 = this.convert_circle_angle_to_ellipse(ctheta2);
 			var tooth = [];
 
 			for (var j = 0; j < this.Involute.length; j++) {

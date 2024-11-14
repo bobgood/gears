@@ -46,6 +46,7 @@ let outline, faces, teeth;
 let lastNumTeeth = 0;
 let lastShift = 0;
 let lastEccentricity = 0;
+let egear2;
 function build(numTeeth = 4, shift = 0, eccentricity = 0) {
     if (numTeeth === lastNumTeeth && shift === lastShift && eccentricity === lastEccentricity) {
         return;
@@ -77,12 +78,11 @@ function build(numTeeth = 4, shift = 0, eccentricity = 0) {
     extrudedMesh4 = extrudeAndAddToScene(egear, extrusionDepth, -(egear.A+egear.B)/2, 0xffffff);
     extrudedMesh4.position.z = 10;
 
-    const egear2 = new EllipticalGear(module, numTeeth, pressureAngle, shift + .5, eccentricity);
+    egear2 = new EllipticalGear(module, numTeeth, pressureAngle, shift + .5, eccentricity);
     scene.remove(extrudedMesh5);
     extrudedMesh5 = extrudeAndAddToScene(egear2, extrusionDepth, (egear.A + egear.B) / 2, 0xffff00);
     extrudedMesh5.position.z = 10;
     extrudedMesh5.rotation.z = Math.PI/2;
-
 }
 
 
@@ -177,7 +177,7 @@ function animate() {
 
     }
     if (extrudedMesh5) {
-        extrudedMesh5.rotation.z = Math.PI / 2 - gearRot; // Rotate around z-axis
+        extrudedMesh5.rotation.z = egear2.convert_angle_to_ellipse_pair(gearRot);
 
     }
 
