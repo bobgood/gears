@@ -57,34 +57,34 @@ function build(numTeeth = 4, shift = 0, eccentricity = 0) {
     const module = 1;
     const extrusionDepth = 2;
 
-    const gear = new SimpleGear(module, numTeeth, pressureAngle, shift);
-    scene.remove(mesh1);
-    mesh1 = extrudeAndAddToScene(gear, extrusionDepth,shift, 0x0077ff);
-
-    // Extrude and add the second gear, offset to the right by the pitchRadius * 2
-    scene.remove(mesh2);
-    mesh2 = extrudeAndAddToScene(gear, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
+//    const gear = new SimpleGear(module, numTeeth, pressureAngle, shift);
+//    scene.remove(mesh1);
+//    mesh1 = extrudeAndAddToScene(gear, extrusionDepth,shift, 0x0077ff);
+//
+//    // Extrude and add the second gear, offset to the right by the pitchRadius * 2
+//    scene.remove(mesh2);
+//    mesh2 = extrudeAndAddToScene(gear, extrusionDepth, gear.Rpitch * 2, 0x00ff88);
 
     const pgear = new PlanetaryGear(module, numTeeth, pressureAngle,shift);
     scene.remove(mesh3);
     mesh3 = extrudeAndAddToScene(pgear, extrusionDepth,0, 0xff77ff);
     mesh3.position.z = 5;
 
-    const egear = new EllipticalGear(module, numTeeth, pressureAngle, shift, eccentricity);
-    scene.remove(mesh4);
-    mesh4 = extrudeAndAddToScene(egear, extrusionDepth, -(egear.A+egear.B)/2, 0xffffff);
-    mesh4.position.z = 10;
-
-    egear2 = new EllipticalGear(module, numTeeth, pressureAngle, shift + .5, eccentricity);
-    scene.remove(mesh5);
-    mesh5 = extrudeAndAddToScene(egear2, extrusionDepth, (egear.A + egear.B) / 2, 0xffff00);
-    mesh5.position.z = 10;
-    mesh5.rotation.z = Math.PI/2;
-
-    frame = new FrameGear(5, 1, 3);
-    scene.remove(mesh6);
-    mesh6 = extrudeAndAddToScene(frame, extrusionDepth, 0, 0xff0000);
-    mesh6.position.z = 13;
+//    const egear = new EllipticalGear(module, numTeeth, pressureAngle, shift, eccentricity);
+//    scene.remove(mesh4);
+//    mesh4 = extrudeAndAddToScene(egear, extrusionDepth, -(egear.A+egear.B)/2, 0xffffff);
+//    mesh4.position.z = 10;
+//
+//    egear2 = new EllipticalGear(module, numTeeth, pressureAngle, shift + .5, eccentricity);
+//    scene.remove(mesh5);
+//    mesh5 = extrudeAndAddToScene(egear2, extrusionDepth, (egear.A + egear.B) / 2, 0xffff00);
+//    mesh5.position.z = 10;
+//    mesh5.rotation.z = Math.PI/2;
+//
+//    frame = new FrameGear(5, 1, 3);
+//    scene.remove(mesh6);
+//    mesh6 = extrudeAndAddToScene(frame, extrusionDepth, 0, 0xff0000);
+//    mesh6.position.z = 13;
 
 }
 

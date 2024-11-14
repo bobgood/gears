@@ -8,7 +8,7 @@ class Shape2D {
         this.Cuts = [];
     }
 
-    drill(x, y, r, N = 100) {
+    drill(x, y, r, N = 200) {
         if (this.Outlines.length != 1) {
             throw "cannot "
         }
@@ -231,9 +231,10 @@ class SimpleGear extends Gear {
 }
 
 class PlanetaryGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, shift, outsideRadius = 0) {
+    constructor(module, numTeeth, pressureAngle, shift, outsideRadius = 0, N=200) {
         super(module, Math.max(20, numTeeth), pressureAngle, shift);
         this.OutsideRadius = Math.max(outsideRadius, this.Raddendum + 1 * module)
+        this.N = Math.round(N / numTeeth);
 
         // these values were just used to build the teeth,
         // this.Rpitch 
@@ -257,7 +258,6 @@ class PlanetaryGear extends Gear {
             var opt = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta);
             var opt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta3);
             outline.push(opt);
-
             var tooth = [];
             var face = [];
 
@@ -280,7 +280,19 @@ class PlanetaryGear extends Gear {
 
             face.push(pt3);
             face.push(opt3);
+
+            for (var j = 1; j < this.N; j++) {
+                var theta1 = theta + j / this.N;
+                var opt1 = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta1);
+                var theta1r = theta + 1-j / this.N;
+                var opt1r = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta1r);
+                outline.push(opt1);
+                face.push(opt1r);
+            }
+
             face.push(opt);
+
+
             this.Faces.push(face);
             this.Faces.push(tooth);
             this.Outlines.push(outline);
