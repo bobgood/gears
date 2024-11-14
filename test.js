@@ -84,7 +84,7 @@ function build(numTeeth = 4, shift = 0, eccentricity = 0) {
     mesh5.position.z = 10;
     mesh5.rotation.z = Math.PI/2;
 
-    frame = new FrameGear(5, 1, 3);
+    frame = new FrameGear(10, 2, 3, .6);
     scene.remove(mesh6);
     mesh6 = extrudeAndAddToScene(frame, extrusionDepth, 0, 0xff0000);
     mesh6.position.z = 13;

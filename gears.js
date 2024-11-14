@@ -435,14 +435,18 @@ class EllipticalGear extends Gear {
 }
 
 class FrameGear extends Shape2D {
-    constructor(radius, width, segments, shift=0, N = 7) {
+    constructor(radius, width, segments,hole_radius, shift=0, N = 200) {
         super();
         this.Radius = radius;
         this.Width = width;
+        this.HoleRadius = hole_radius;
         this.Segments = segments;
         this.N = Math.round(N / segments);
         this.Shift = shift;
         this.generate_frame_gear();
+        if (this.HoleRadius * 2 >= this.Width) {
+            this.HoleRadius = this.Width / 3;
+        }
     }
 
     Point(f0, f1) {
@@ -452,23 +456,38 @@ class FrameGear extends Shape2D {
         return pt;
     }
 
+    PointH(f0, f1, r2=this.HoleRadius) {
+        var theta0 = (f0 + this.Shift) * Math.PI * 2 / this.Segments;
+        var theta1 = f1 * Math.PI * 2 / this.Segments;
+        var pt = { x: this.Radius * Math.cos(theta0) + r2 * Math.cos(theta0 + theta1), y: this.Radius * Math.sin(theta0) + r2 * Math.sin(theta0 + theta1) };
+        return pt;
+    }
+
     generate_frame_gear() {
         var outline = [];
         var cutLine = [];
         var ptc ={ x:0, y: 0}
         for (var i = 0; i < this.Segments; i++) {
-            var face = [ptc];
             for (var j = -this.N / 2; j <= this.N / 2; j++) {
+                var face = [ptc];
                 var pt = this.Point(i, j / this.N);
                 face.push(pt);
                 outline.push(pt);
+                face.push(this.Point((i + 1) % this.Segments, -.5));
+
+                this.Faces.push(face);
             }
 
-            face.push(this.Point((i + 1) % this.Segments, -.5));
-
-            this.Faces.push(face);
             var pt1 = this.Point(i, this.Segments/2);
             cutLine.push(pt1);
+            var hole=[]
+            if (this.HoleRadius > 0) {
+                for (j = 0; j <= this.N*this.Segments; j++) {
+                    hole.push(this.PointH(i, j / this.N));
+                }
+
+                this.Cuts.push(hole);
+            }
         }
 
         this.Outlines.push(outline);

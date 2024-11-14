@@ -10,7 +10,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/earcut@2.2.2/dist/earcut.min.js"></script>
     <!-- Link to your custom JavaScript file -->
     <script>
-        const version = new Date().getTime(); // Use current timestamp
+        const version = new Date().getTime()+"."; // Use current timestamp
         document.write(`<script defer src="extrude.js?v=${version}"><\/script>`);
         document.write(`<script defer src="ellipse_math.js?v=${version}"><\/script>`);
         document.write(`<script defer src="gears.js?v=${version}"><\/script>`);
