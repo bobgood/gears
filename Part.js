@@ -269,14 +269,10 @@ class Shape3D extends Util {
 class Root3D extends Shape3D {
     constructor(json) {
         super(json);
-        this.scene = new THREE.Scene();
-        this.object3D = this.scene;
+        this.object3D = new THREE.Scene();
         root_object = this;
         this.rebuild_all = false;
         this.camera = null;
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
     }
 
     animate() {
@@ -286,8 +282,9 @@ class Root3D extends Shape3D {
 
         this.reset_cache();
         this.move1();
-        this.rebuild = false;
-        this.renderer.render(this.object3D, this.camera);
+        this.rebuild_all = false;
+        //        this.renderer.render(this.object3D, this.camera);
+        grenderer.render(this.object3D, this.camera);
     }
 }
 
@@ -318,6 +315,7 @@ class ExtrudedGear3D extends Shape3D {
     }
 
     extrude() {
+        console.log("extrude "+this.Name)
         const extruder = new Extrude(this.Shape2D, this.getParameter("Thickness"));
         const mesh = extruder.getMesh(this.getParameter("Color"));
         this.set(mesh);
@@ -457,8 +455,8 @@ class Epicyclic3D extends Shape3D {
 class Camera3D extends Shape3D {
     constructor(json) {
         super(json);
-        this.object3D = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
+        this.object3D = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);;
+        this.object3D.position.z = 5;
     }
 
     build() {

@@ -1,6 +1,10 @@
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+// Set up the scene, camera, and renderer
+const grenderer = new THREE.WebGLRenderer();
+grenderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(grenderer.domElement);
+
+
+
 
 slider_defs = [
     ["mySlider1", "sliderValue1", 0, 100, 50, "unused", ""],
@@ -77,10 +81,11 @@ function animate() {
 function start() {
     if (root_object != null) {
         root_object.reset_cache();
+        root_object.rebuild_all=true;
     }
     ConfigureMechanism(configuration_json)
 
     animate();
 }
 
-start();
+//start();
