@@ -24,10 +24,9 @@ class Shape3D extends Util {
     }
 
     add(child) {
-        console.log("added " + child.Name + " to " + this.Name);
         this.childrenmap[child.Name] = child;
         child.Parent = this;
-        if (child instanceof Root3D) {
+        if (child.Type=="Root") {
         }
         else if (child instanceof Camera3D) {
             this.camera = child.object3D;
@@ -57,6 +56,7 @@ class Shape3D extends Util {
         if (this.object3D !== null) {
             this.Parent.object3D.remove(this.object3D);
         }
+
         this.object3D = ob;
         this.Parent.object3D.add(this.object3D);
         move();
@@ -65,7 +65,6 @@ class Shape3D extends Util {
     reset_cache() {
         this.cache = {};
         for (var child in this.childrenmap) {
-            console.log(child);
             this.childrenmap[child].reset_cache();
         }
     }
@@ -158,7 +157,7 @@ class Shape3D extends Util {
     }
 
     resolveParams(params) {
-        args = [];
+        var args = [];
         for (var p in params) {
             args.push(this.getParameter(p));
         }
@@ -179,7 +178,7 @@ class Shape3D extends Util {
         var left = text;
         var params = null;
         const parenIndex = text.indexOf('(', 1);
-        if (parenIndex > 1 && text.charAt(text.length - 1) === ')');
+        if (parenIndex > 1 && text.charAt(text.length - 1) === ')')
         {
             left = text.substring(0, parenIndex);
             const right = text.substring(parenIndex + 1, text.length - 1);
@@ -190,7 +189,7 @@ class Shape3D extends Util {
         let f1;
         for (var i = 0; i < scopes.length; i++) {
             // order:  1) named child,
-            if (f1 = scope.childrenmap[scopes[i]] !== undefined) {
+            if ((f1 = scope.childrenmap[scopes[i]]) !== undefined) {
                 scope = f1;
                 break;
             }
@@ -198,8 +197,8 @@ class Shape3D extends Util {
             // 2) ancestors named child(if first), 
             if (i == 0) {
                 let parent;
-                while (parent = scope.Parent != null) {
-                    if (f1 = parent.childrenmap[scopes[i]] !== undefined) {
+                while ((parent = scope.Parent) != null) {
+                    if ((f1 = parent.childrenmap[scopes[i]]) !== undefined) {
                         scope = f1;
                         break;
                     }
@@ -285,7 +284,7 @@ class ExtrudedGear3D extends Shape3D {
     }
 
     extrude() {
-        const extruder = new Extrude(shape, this.getParameter("Thickness"));
+        const extruder = new Extrude(this.Shape2D, this.getParameter("Thickness"));
         const mesh = extruder.getMesh(this.getParameter("Color"));
         this.set(mesh);
     }
@@ -297,7 +296,7 @@ class SimpleGear3D extends ExtrudedGear3D {
     }
 
     build() {
-        this.Shape2D = SimpleGear2D(
+        this.Shape2D = new SimpleGear2D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
             this.getParameter("PressureAngle") * Math.PI / 180,
@@ -327,7 +326,7 @@ class FrameGear3D extends ExtrudedGear3D {
     }
 
     build() {
-        this.Shape2D = FrameGear2D(
+        this.Shape2D = new FrameGear2D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
             this.getParameter("PressureAngle") * Math.PI / 180,
@@ -358,7 +357,7 @@ class PlanetaryGear3D extends ExtrudedGear3D {
 
 
     build() {
-        this.Shape2D = FrameGear2D(
+        this.Shape2D = new PlanetaryGear3D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
             this.getParameter("PressureAngle") * Math.PI / 180,
@@ -382,7 +381,7 @@ class EllipticalGear3D extends ExtrudedGear3D {
     }
 
     build() {
-        this.Shape2D = FrameGear2D(
+        this.Shape2D = new EllipticalGear3D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
             this.getParameter("PressureAngle") * Math.PI / 180,
@@ -444,7 +443,7 @@ class AmbientLight3D extends Shape3D {
 class DirectionalLight3D extends Shape3D {
     constructor(json) {
         super(json);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Color and intensity
+        this.object3D = new THREE.DirectionalLight(0xffffff, 1); // Color and intensity
     }
 
     build() {
@@ -457,11 +456,12 @@ function ConfigureMechanism(data) {
         let parentPath;
         var part = CreatePart(partdef); 
         if (part.Type == "Root") { }
-        else if (parentPath = partdef.Parent !== undefined) {
+        else if ((parentPath = partdef.Parent) !== undefined) {
             var parent = root_object.getParameter(parentPath);
             parent.add(part);
         }
         else {
+            part.build();
             root_object.add(part);
         }
     }
