@@ -89,9 +89,10 @@ function start() {
 }
 
 function test() {
-    var g2 = root_object.childrenmap["gear2"];
-    var v = g2.getParameter("mult(gear1.Rpitch, 2)");
-    console.log(v);
+//    var g2 = root_object.childrenmap["gear2"];
+//    var v = g2.getParameter("mult(gear1.Rpitch, 2)");
+//    console.log(v);
+    start();
 }
 
 start();

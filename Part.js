@@ -429,7 +429,7 @@ class PlanetaryGear3D extends ExtrudedGear3D {
 
 
     build() {
-        this.Shape2D = new PlanetaryGear3D(
+        this.Shape2D = new PlanetaryGear2D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
             this.getParameter("PressureAngle"),
@@ -453,7 +453,7 @@ class EllipticalGear3D extends ExtrudedGear3D {
     }
 
     build() {
-        this.Shape2D = new EllipticalGear3D(
+        this.Shape2D = new EllipticalGear2D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
             this.getParameter("PressureAngle"),
@@ -478,6 +478,10 @@ class EllipticalGear3D extends ExtrudedGear3D {
         }
 
         this.extrude();
+    }
+
+    convert_angle_to_ellipse_pair(ang) {
+        return this.Shape2D.convert_angle_to_ellipse_pair(ang);
     }
 }
 

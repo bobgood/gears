@@ -64,52 +64,55 @@ configuration_json = [
         "RotationZ": "radians(neg(SliderGearRot))"
 
     },
-//    {
-//        "Type": "PlanetaryGear",
-//        "Name": "pgear",
-//        "Module": "Module",
-//        "Shift": "SliderToothShift",
-//        "NumberOfTeeth": "SliderNumberOfTeeth",
-//        "Color": "#ff77ff",
-//        "PositionZ": 5
-//    },
-//    {
-//        "Type": "EllipticalGear",
-//        "Name": "egear",
-//        "Module": "Module",
-//        "Eccentricity": "SliderEccentricity",
-//        "Shift": "SliderToothShift",
-//        "NumberOfTeeth": "SliderNumberOfTeeth",
-//        "Color": "#ffffff",
-//        "Slot": "Slot1",
-//        "PositionZ": 10,
-//        "PositionX": "neg(ave(egear.A, egear.B))"
-//    },
-//    {
-//        "Type": "EllipticalGear",
-//        "Name": "egear2",
-//        "Module": "Module",
-//        "Eccentricity": "SliderEccentricity",
-//        "Shift": "SliderToothShift",
-//        "NumberOfTeeth": "SliderNumberOfTeeth",
-//        "Color": "#ffff00",
-//        "Slot": "Slot1",
-//        "PositionZ": 10,
-//        "PositionX": "ave(egear.A, egear.B)",
-//        "RotationZ": "radians(90)"
-//    },
-//    {
-//        "Type": "FrameGear",
-//        "Name": "fgear",
-//        "Module": "Module",
-//        "NumberOfTeeth": "SliderNumberOfTeeth",
-//        "Color": "0x0077ff",
-//        "Position": [0, 0, 0],
-//        "FrameRadius": "max(5,mult(gear.Rdedendum),0.7)",
-//        "NumberOfSegments": 4,
-//        "FrameShift": 0,
-//        "HoleRadius": 1,
-//        "Tolerance": .6,
-//        "PositionZ": 15,
-//    }
+    {
+        "Type": "PlanetaryGear",
+        "Name": "pgear",
+        "Module": "Module",
+        "Shift": "SliderToothShift",
+        "NumberOfTeeth": "SliderNumberOfTeeth",
+        "OusideRadius": "SliderNumberOfTeeth",
+        "Color": "#ff77ff",
+        "RotationZ": "radians(SliderGearRot)",
+        "PositionZ": 5
+    },
+    {
+        "Type": "EllipticalGear",
+        "Name": "egear",
+        "Module": "Module",
+        "Eccentricity": "SliderEccentricity",
+        "Shift": "SliderToothShift",
+        "NumberOfTeeth": "SliderNumberOfTeeth",
+        "RotationZ": "radians(SliderGearRot)",
+        "Color": "#ffffff",
+        "Slot": "Slot1",
+        "PositionZ": 10,
+        "PositionX": "neg(ave(egear.A, egear.B))"
+    },
+    {
+        "Type": "EllipticalGear",
+        "Name": "egear2",
+        "Module": "Module",
+        "Eccentricity": "SliderEccentricity",
+        "Shift": "sum(.5,neg(SliderToothShift))",
+        "NumberOfTeeth": "SliderNumberOfTeeth",
+        "Color": "#ffff00",
+        "Slot": "Slot1",
+        "PositionZ": 10,
+        "PositionX": "ave(egear.A, egear.B)",
+        "RotationZ": "convert_angle_to_ellipse_pair(radians(SliderGearRot))"
+    },
+    {
+        "Type": "FrameGear",
+        "Name": "fgear",
+        "Module": "Module",
+        "NumberOfTeeth": "SliderNumberOfTeeth",
+        "Color": "#0077ff",
+        "FrameRadius": 6,
+        "NumberOfSegments": 4,
+        "FrameShift": 0,
+        "HoleRadius": 1,
+        "Tolerance": .6,
+        "PositionZ": 15,
+        "RotationZ": "radians(SliderGearRot)",
+    }
 ]
