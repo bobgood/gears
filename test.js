@@ -125,83 +125,8 @@ const sliderValueDisplayB6 = document.getElementById('sliderValueB6');
 // Animation loop to render the scene
 function animate() {
     requestAnimationFrame(animate);
-    const value1 = Number(slider1.value);
-    sliderValueDisplay1.textContent = value1;
-    const value2 = Number(slider2.value);
-    sliderValueDisplay2.textContent = value2;
-    const value3 = Number(slider3.value);
-    sliderValueDisplay3.textContent = value3;
-    const value4 = Number(slider4.value);
-    sliderValueDisplay4.textContent = value4;
-    const value5 = Number(slider5.value);
-    sliderValueDisplay5.textContent = value5;
-    const value6 = Number(slider6.value);
-    sliderValueDisplay6.textContent = value6;
-    const valueB1 = Number(sliderB1.value);
-    sliderValueDisplayB1.textContent = valueB1;
-    const valueB2 = Number(sliderB2.value);
-    sliderValueDisplayB2.textContent = valueB2;
-    const valueB3 = Number(sliderB3.value);
-    sliderValueDisplayB3.textContent = valueB3;
-    const valueB4 = Number(sliderB4.value);
-    sliderValueDisplayB4.textContent = valueB4;
-    const valueB5 = Number(sliderB5.value);
-    sliderValueDisplayB5.textContent = valueB5;
-    const valueB6 = Number(sliderB6.value);
-    sliderValueDisplayB6.textContent = valueB6;
-    zoom = valueB1;
-    panX = -valueB2;
-    panY = -valueB3;
-    rotationY = -valueB4*Math.PI/180;
-    gearRot = valueB5 *Math.PI/180;
-
-    toothCount = value6;
-    toothShift = (value2 - 50) / 50;
-    eccentricity = value3 / 100;
-    build(toothCount, toothShift, eccentricity)
-    
-    // Rotate both extruded meshes if they exist
-    if (mesh1) {
-        mesh1.rotation.z += 0.01; // Rotate around z-axis
-        //camera.rotation.z+=.05;
-
-        var rot2=Math.PI/value6+Math.PI;
-
-//        // Use the slider value in your three.js code, e.g., to change cube rotation speed
-          mesh1.rotation.z = gearRot; // Rotate around z-axis
-    }
-    if (mesh2) {
-        mesh2.rotation.z -= 0.01; // Rotate around z-axis
-         mesh2.rotation.z = rot2-gearRot; // Rotate around z-axis
-
-    }
-    if (mesh3) {
-        mesh3.rotation.z = gearRot; // Rotate around z-axis
-
-    }
-    if (mesh4) {
-        mesh4.rotation.z = gearRot; // Rotate around z-axis
-
-    }
-    if (mesh5) {
-        mesh5.rotation.z = egear2.convert_angle_to_ellipse_pair(gearRot);
-
-    }
-    if (mesh6) {
-        mesh6.rotation.z = gearRot;
-    }
-
-    var cx = panX + zoom * Math.sin(rotationY);
-    var cz = zoom * Math.cos(rotationY);
-//    camera.position.set(panX, panY, zoom);
-//    directionalLight.position.set(panX, panY, zoom); // Position the light above and to the side
-
-    camera.position.set(cx, panY, cz);
-    directionalLight.position.set(cx,panY,cz); // Position the light above and to the side
-
-    camera.lookAt(new THREE.Vector3(panX, panY, 0)); // Keep looking toward the scene center
-
-    renderer.render(scene, camera);
+    check_sliders();
+    root_object.animate();
 }
  
 // Start the animation loop

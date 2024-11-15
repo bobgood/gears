@@ -66,5 +66,6 @@ function check_sliders()
     }
 }
 
-ReadJson("clock");
+ReadJson("clock").animate();
+
 

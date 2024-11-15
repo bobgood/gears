@@ -1,5 +1,4 @@
 
-named_objects = {};
 root_object = null;
 
 class Util {
@@ -14,14 +13,13 @@ class Util {
     neg(x) { return -x; }
     max(a,b) { return Math.max(a,b); }
 }
+
 class Shape3D extends Util {
     constructor(initialization) {
         super();
         this.object3D = null;
         Object.assign(this, initialization);
-        named_objects[Name] = this;
         this.children = {};
-        parent().children[this.Name] = this;
         this.cache = {};
     }
 
@@ -31,23 +29,13 @@ class Shape3D extends Util {
         if (obj instanceof Camera3D) {
             this.camera = child.object3D;
         }
-        else {
+        else if (obj instanceof Shape3D) {
             this.object3D.add(child.object3D);
         }
     }
 
     rebuild() {
         root_object.rebuild_all = true;
-    }
-
-    parent() {
-        if (this instanceof Root3D) {
-            return null;
-        } else if (this.Parent === undefined) {
-            return root_object;
-        } else {
-            return named_objects[json.Parent];
-        }
     }
 
     children() {
@@ -65,12 +53,13 @@ class Shape3D extends Util {
         return parseInt(colorHex, 16);
     }
 
+    // called if an object was rebuilt
     set(ob) {
         if (this.object3D !== null) {
-            this.parent().object3D.remove(this.object3D);
+            this.Parent.object3D.remove(this.object3D);
         }
         this.object3D = ob;
-        this.parent.object3D.add(this.object3D);
+        this.Parent.object3D.add(this.object3D);
         move();
     }
 
@@ -250,9 +239,13 @@ class Root3D extends Shape3D {
         root_object = this;
         this.rebuild_all = false;
         this.camera = null;
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
     }
 
     animate() {
+        check_sliders();
         if (this.rebuild_all) {
             this.rebuild1();
         }
@@ -260,6 +253,8 @@ class Root3D extends Shape3D {
         this.reset_cache();
         this.move1();
         this.rebuild = false;
+        this.renderer.render(this.scene, this.camera);
+
     }
 }
 
@@ -449,13 +444,35 @@ class AmbientLight3D extends Shape3D {
 
     }
 }
+
 class DirectionalLight3D extends Shape3D {
     constructor(json) {
         super(json);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Color and intensity
     }
 
     build() {
+
     }
+}
+
+function ReadJson(name) {
+
+    import data from './data.json' assert { type: 'json' };
+    for (var partdef of data) {
+        let parentPath;
+        var part = CreatePart(partdef); 
+        if (part.Type == "Root") { }
+        else if (parentPath = partdef.Parent !== undefined) {
+            var parent = root_object.getParameter(parentPath);
+            parent.add(part);
+        }
+        else {
+            root_object.add(part);
+        }
+    }
+
+    return root_object;
 }
 
 function CreatePart(json) {
