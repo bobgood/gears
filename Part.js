@@ -184,12 +184,12 @@ class Shape3D extends Util {
     }
 
     runFunction(name, args) {
-        for (var i = 0; i < args.length; i++)
-        {
-            if (args[i] == null || args[i] === undefined || (typeof args[i] === "number" && Number.isNaN(args[i]))) {
-                console.error("missing parameter " + i + " for function " + name+ " ("+args+")");
-            }
-        }
+//        for (var i = 0; i < args.length; i++)
+//        {
+//            if (args[i] == null || args[i] === undefined || (typeof args[i] === "number" && Number.isNaN(args[i]))) {
+//                console.error("missing parameter " + i + " for function " + name+ " ("+args+")");
+//            }
+//        }
 
         var x = this[name](...args);
         return x;
@@ -515,7 +515,6 @@ class Camera3D extends Shape3D {
         const pan = new THREE.Vector3(this.panX, this.panY, 0);
         // Make the camera look at the object's center
         this.object3D.lookAt(pan);
-        console.log("lookat", x, y, z, this.panX, this.panY, this.angle, this.zoom)
     }
 
 
@@ -557,6 +556,23 @@ class DirectionalLight3D extends Shape3D {
     constructor(json) {
         super(json);
         this.object3D = new THREE.DirectionalLight(0xffffff, 1); // Color and intensity
+        this.angle = 0;
+        this.view();
+    }
+
+    view() {
+        const x = 200 * Math.sin(this.angle);
+        const y = 0; 
+        const z = 200 * Math.cos(this.angle);
+
+        // Set the camera position
+        this.object3D.position.set(x, y, z);
+    }
+
+
+    lookAtAngle(z) {
+        this.angle = z;
+        this.view();
     }
 
     build() {

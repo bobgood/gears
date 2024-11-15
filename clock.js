@@ -36,9 +36,7 @@ configuration_json = [
     {
         "Type": "DirectionalLight",
         "Name": "DirectionalLight",
-        "PositionY": "SliderPanY",
-        "PositionX": "rsin(SliderZoom,radians(SliderRotationY)))",
-        "PositionZ": "rcos(SliderZoom,radians(SliderRotationY))",
+        "LookAtAngle": "radians(SliderRotationY)",
     },
 
     
@@ -50,7 +48,8 @@ configuration_json = [
         "NumberOfTeeth": "SliderNumberOfTeeth",
         "Color": "#0077ff",
         "Position": [0, 0, 0],
-        "Slot": "Slot1"
+        "Slot": "Slot1",
+        "RotationZ": "radians(SliderGearRot)",
 
     },
 //    {

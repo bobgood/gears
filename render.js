@@ -16,7 +16,7 @@ slider_defs = [
     ["mySliderB2", "sliderValueB2", -50, 50, 0, "PanX:", "SliderPanX", (x) => -x],
     ["mySliderB3", "sliderValueB3", -50, 50, 0, "PanY", "SliderPanY", (x) => -x],
     ["mySliderB4", "sliderValueB4", -180, 180, 0, "RotationY", "SliderRotationY"],
-    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot"], 
+    ["mySliderB5", "sliderValueB5", -180, 180, 0, "Gear Rot:", "SliderGearRot"], 
     ["mySliderB6", "sliderValueB6", 0, 100, 50, "unused", ""]
 ];
 
