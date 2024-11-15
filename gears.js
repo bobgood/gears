@@ -17,24 +17,34 @@ class Gear2D extends Shape2D {
 
         // shift the zero angle of the gear by shift teeth distances
         this.Shift = shift;
+        if (shift === undefined) throw new Error("shift is undefined");
+        if (numberOfTeeth === undefined) throw new Error("numberOfTeeth is undefined");
+        if (numberOfTeeth < 4) throw new Error("numberOfTeeth is too small");
+        if (pressureAngle === undefined) throw new Error("pressureAngle is undefined");
 
         // Rp aka r pitch
         this.Rpitch = this.pitch_diameter() / 2.0;
+        if (Rpitch === undefined) throw new Error("Rpitch is undefined");
 
         // Rb aka r base
         this.Rbase = this.base_diameter() / 2.0;
+        if (Rbase === undefined) throw new Error("Rbase is undefined");
 
         // Rd aka r dedendum aka r min
         this.Rdedendum = this.Rpitch - this.dedendum();
+        if (Rdedendum === undefined) throw new Error("Rdedendum is undefined");
 
         // Ra aka r addendum aka r max
         this.Raddendum = this.Rpitch + this.addendum();
+        if (Raddendum === undefined) throw new Error("Raddendum is undefined");
 
         // thickness of the tooth
         this.Ttooth = this.tooth_thickness();
+        if (Ttooth === undefined) throw new Error("Ttooth is undefined");
 
         // smoothing points along the involute curve
         this.Smoothing = 20;
+        if (Smoothing === undefined) throw new Error("Smoothing is undefined");
 
         // calculates the form of the involute curve
         this.Base_involute_curve = this.involute_curve();

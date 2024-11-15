@@ -11,7 +11,7 @@
       "SlotWidth": 1,
       "SlotDepth": 2.5
     },
-    "SlotShift": 0,
+    "SlotShift": 0
     
   },
   {
@@ -21,7 +21,7 @@
     "NumberOfTeeth": 20,
     "Color": "0x0000ff",
     "Position": [ 0, 0, 0 ],
-    "Slot": "@Slot1"
+    "Slot": "Slot1"
 
   },
   {

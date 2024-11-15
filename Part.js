@@ -151,6 +151,8 @@ class Shape3D extends Util {
 
     lookupParameter(field, defaultValue = null) {
         let r;
+        console.log("3", this.Name, field, this[field]);
+
         if (r = this.cache[field] === undefined) {
             r = this[field];
             if (typeof r === 'string') {
@@ -173,8 +175,9 @@ class Shape3D extends Util {
 
     resolveParams(params) {
         var args = [];
-        for (var p in params) {
-            args.push(this.getParameter(p));
+        let pp;
+        for (pp of params) {
+            args.push(this.getParameter(pp));
         }
 
         return args;
@@ -182,7 +185,20 @@ class Shape3D extends Util {
     }
 
     runFunction(name, args) {
-        return this[name](args);
+        var x = this[name](...args);
+        return x;
+    }
+
+    getParameterSub(sub, field, defaultValue = null) {
+         
+        if (sub === null || sub === undefined) {
+            return defaultValue;
+        }
+        if (sub[field] === undefined) {
+            return defaultValue;
+        }
+
+        return this.getParameter(sub[field], defaultValue);
     }
 
     getParameter(text, defaultValue = null) {
@@ -225,16 +241,18 @@ class Shape3D extends Util {
             // 3) named parameter(if last and no parameters), 
             if (i == scopes.length - 1) {
                 if (params === null) {
-                    while (scope[scopes[i]] === scopes[i]) {
+                    while (scope[scopes[i]] === scopes[i]
+                    || (scope[scopes[i]]==undefined)) {
                         scope = scope.Parent;
                         if (scope === null) {
                             return defaultValue;
                         }
                     }
+
                     return scope.lookupParameter(scopes[i], defaultValue);
                 }
                 else {
-             // 4) function (last and has parameters)
+                    // 4) function (last and has parameters)
                     return scope.runFunction(scopes[i], this.resolveParams(params));
                 }
 
@@ -300,7 +318,6 @@ class ExtrudedGear3D extends Shape3D {
     }
 
     extrude() {
-        console.log(this.Shape2D);
         const extruder = new Extrude(this.Shape2D, this.getParameter("Thickness"));
         const mesh = extruder.getMesh(this.getParameter("Color"));
         this.set(mesh);
@@ -319,11 +336,11 @@ class SimpleGear3D extends ExtrudedGear3D {
             this.getParameter("PressureAngle") * Math.PI / 180,
             this.getParameter("Shift"));
         var slot = this.getParameter("Slot");
-        if (slot) {
+        if (slot!=undefined && slot!=null) {
             this.Shape2D.slot(
-                this.getParameter("Slot.SlotWidth"),
-                this.getParameter("Slot.SlotWidth"),
-                this.getParameter("Slot.SlotDepth"),
+                this.getParameterSub(slot,"HoleRadius"),
+                this.getParameterSub(slot,"SlotWidth"),
+                this.getParameterSub(slot,"SlotDepth"),
                 this.getParameter("SlotShift"));
         }
 
@@ -414,11 +431,11 @@ class EllipticalGear3D extends ExtrudedGear3D {
         this.B = this.Shape2D.B;
 
         var slot = this.getParameter("Slot");
-        if (slot) {
+        if (slot != undefined && slot != null) {
             this.Shape2D.slot(
+                this.getParameterSub(slot, "HoleRadius"),
                 this.getParameterSub(slot, "SlotWidth"),
-                this.getParameterSub("SlotWidth"),
-                this.getParameterSub("SlotDepth"),
+                this.getParameterSub(slot, "SlotDepth"),
                 this.getParameter("SlotShift"));
         }
 

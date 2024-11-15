@@ -28,7 +28,7 @@ function set_sliders()
         var slider = document.getElementById(sliderdef[0])
         var display = document.getElementById(sliderdef[1]);
         slider_ids.push(
-            { slider: slider, display: display, prev: sliderdef[4] }
+            { slider: slider, display: display, prev: null }
         );
         slider.min = sliderdef[2];
         slider.max = sliderdef[3];
@@ -48,6 +48,7 @@ function check_sliders()
     for (var i = 0; i < slider_defs.length; i++) {
         var was = slider_ids[i].prev;
         const value = Number(slider_ids[i].slider.value);
+        console.log("slider " + i + " " + value);
         slider_ids[i].prev = value;
         slider_ids[i].display.textContent = value;
         if (was != value) {

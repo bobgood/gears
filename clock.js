@@ -15,7 +15,7 @@ configuration_json = [
         "SlotShift": 0,
         "SliderToothShift": 0,
         "SliderEccentricity": 0,
-        "SliderNumberOfTeeth": 0,
+        "SliderNumberOfTeeth": 12,
         "SliderZoom": 0,
         "SliderPanX": 0,
         "SliderPanY": 0,
