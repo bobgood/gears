@@ -2,7 +2,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-sliders = [
+slider_defs = [
     ["mySlider1", "sliderValue1", 0, 100, 50, "unused", ""],
     ["mySlider2", "sliderValue2", 0, 100, 50, "Tooth Shift:", "SliderToothShift", (x) => (x - 50) / 50],
     ["mySlider3", "sliderValue3", 0, 100, 50, "Eccentricity", "SliderEccentricity", (x) => x / 100],
@@ -14,16 +14,17 @@ sliders = [
     ["mySliderB2", "sliderValueB2", 0, 100, 50, "PanX:", "SliderPanX", (x) => -x],
     ["mySliderB3", "sliderValueB3", 0, 100, 50, "PanY", "SliderPanY", (x) => -x],
     ["mySliderB4", "sliderValueB4", 0, 100, 50, "RotationY", "SliderRotationY", (x) => -x * Math.PI / 180],
-    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot", (x) => x * Math.PI / 180], ,
+    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot", (x) => x * Math.PI / 180], 
     ["mySliderB6", "sliderValueB6", 0, 100, 50, "unused", ""]
 ];
 
 destructiveSliders = ["SliderShift", "SliderEccentricity", "SliderNumberOfTeeth"]
 
 slider_ids=[]
-function set_sliders(sliders)
+function set_sliders()
 {
-    for (let sliderdef in sliders) {
+    for (var i = 0; i < slider_defs.length;i++) {
+        sliderdef = slider_defs[i];
         var slider = document.getElementById(sliderdef[0])
         var display = document.getElementById(sliderdef[1]);
         slider_ids.push(
@@ -44,7 +45,7 @@ set_sliders();
 
 function check_sliders()
 {
-    for (var i = 0; i < sliders.length; i++) {
+    for (var i = 0; i < slider_defs.length; i++) {
         var was = slider_ids[i].prev;
         const value = Number(slider_ids[i].slider.value);
         slider_ids[i].prev = value;

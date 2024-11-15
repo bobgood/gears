@@ -17,14 +17,15 @@ class Util {
 class Shape3D extends Util {
     constructor(initialization) {
         super();
-        this.object3D = null;
         Object.assign(this, initialization);
-        this.children = {};
+        this.childrenmap = {};
         this.cache = {};
+        this.Parent = null;
     }
 
     add(child) {
-        this.children[child.Name] = child;
+        console.log("added " + child.Name + " to " + this.Name);
+        this.childrenmap[child.Name] = child;
         child.Parent = this;
         if (child instanceof Root3D) {
         }
@@ -38,10 +39,6 @@ class Shape3D extends Util {
 
     rebuild() {
         root_object.rebuild_all = true;
-    }
-
-    children() {
-        return Object.values(this.children);
     }
 
     color(c) {
@@ -67,13 +64,15 @@ class Shape3D extends Util {
 
     reset_cache() {
         this.cache = {};
-        for (var child in children) {
-            child.reset_cache();
+        for (var child in this.childrenmap) {
+            console.log(child);
+            this.childrenmap[child].reset_cache();
         }
     }
 
     rebuild1() {
-        for (var child in this.children()) {
+        for (var name in this.childrenmap) {
+            var child=this.childrenmap[name];
             child.build();
             child.rebuild1();
         }
@@ -133,7 +132,8 @@ class Shape3D extends Util {
             this.object3D.rotation.z = v;
         }
 
-        for (var child in this.children()) {
+        for (var name in this.childrenmap) {
+            var child = this.childrenmap[name];
             child.move1();
         }
 
@@ -190,17 +190,17 @@ class Shape3D extends Util {
         let f1;
         for (var i = 0; i < scopes.length; i++) {
             // order:  1) named child,
-            if (f1 = scope.children[scopes[i]] !== undefined) {
-                scope = scope.children[scopes[i]];
+            if (f1 = scope.childrenmap[scopes[i]] !== undefined) {
+                scope = f1;
                 break;
             }
 
             // 2) ancestors named child(if first), 
             if (i == 0) {
                 let parent;
-                while (parent = scope.parent() != null) {
-                    if (f1 = parent.children[scopes[i]] !== undefined) {
-                        scope = parent.children[scopes[i]];
+                while (parent = scope.Parent != null) {
+                    if (f1 = parent.childrenmap[scopes[i]] !== undefined) {
+                        scope = f1;
                         break;
                     }
 
@@ -213,8 +213,8 @@ class Shape3D extends Util {
                     return scope.lookupParameter(scopes[i], defaultValue);
                 }
                 else {
+             // 4) function (last and has parameters)
                     return scope.runFunction(scopes[i], this.resolveParams(params));
-                    //            4) function (last and has parameters)
                 }
 
             }
@@ -234,10 +234,10 @@ class Shape3D extends Util {
 }
 
 class Root3D extends Shape3D {
-    constructor(scene) {
-        super(null, null);
+    constructor(json) {
+        super(json);
         this.scene = new THREE.Scene();
-        this.object3D = scene;
+        this.object3D = this.scene;
         root_object = this;
         this.rebuild_all = false;
         this.camera = null;
@@ -255,8 +255,7 @@ class Root3D extends Shape3D {
         this.reset_cache();
         this.move1();
         this.rebuild = false;
-        this.renderer.render(this.scene, this.camera);
-
+        this.renderer.render(this.object3D, this.camera);
     }
 }
 
@@ -295,7 +294,6 @@ class ExtrudedGear3D extends Shape3D {
 class SimpleGear3D extends ExtrudedGear3D {
     constructor(json) {
         super(json);
-        build();
     }
 
     build() {
@@ -326,7 +324,6 @@ class SimpleGear3D extends ExtrudedGear3D {
 class FrameGear3D extends ExtrudedGear3D {
     constructor(json) {
         super(json);
-        build();
     }
 
     build() {
@@ -357,7 +354,6 @@ class FrameGear3D extends ExtrudedGear3D {
 class PlanetaryGear3D extends ExtrudedGear3D {
     constructor(json) {
         super(json);
-        build();
     }
 
 
@@ -383,7 +379,6 @@ class PlanetaryGear3D extends ExtrudedGear3D {
 class EllipticalGear3D extends ExtrudedGear3D {
     constructor(json) {
         super(json);
-        build();
     }
 
     build() {
@@ -418,7 +413,6 @@ class EllipticalGear3D extends ExtrudedGear3D {
 class Epicyclic3D extends Shape3D {
     constructor(json) {
         super(json);
-        build();
     }
 
     build() {
@@ -481,7 +475,7 @@ function CreatePart(json) {
             return new Root3D(json);
         case "Camera":
             return new Camera3D(json);
-        case "AmbientLight3D":
+        case "AmbientLight":
             return new AmbientLight3D(json);
         case "DirectionalLight":
             return new DirectionalLight3D(json);
