@@ -5,7 +5,7 @@
     "Module": 1,
     "PressureAngle": 20,
     "Shift": 0,
-    "Depth": 2,
+    "Thickness": 2,
     "Slot1": {
       "HoleRadius": 2,
       "SlotWidth": 1,

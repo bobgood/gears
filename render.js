@@ -5,25 +5,25 @@ document.body.appendChild(renderer.domElement);
 sliders = [
     ["mySlider1", "sliderValue1", 0, 100, 50, "unused", ""],
     ["mySlider2", "sliderValue2", 0, 100, 50, "Tooth Shift:", "SliderToothShift", (x) => (x - 50) / 50],
-    ["mySlider3", "sliderValue3", 0, 100, 50, "Eccentricity", "SliderEccentricity", (x)=>x/100],
+    ["mySlider3", "sliderValue3", 0, 100, 50, "Eccentricity", "SliderEccentricity", (x) => x / 100],
     ["mySlider4", "sliderValue4", 0, 100, 50, "unused", ""],
     ["mySlider5", "sliderValue5", 0, 100, 50, "unused", ""],
     ["mySlider6", "sliderValue6", 0, 100, 12, "Teeth Count", "SliderNumberOfTeeth"],
 
     ["mySliderB1", "sliderValueB1", 0, 100, 50, "zoom:", "SliderZoom"],
-    ["mySliderB2", "sliderValueB2", 0, 100, 50, "PanX:", "SliderPanX", (x)=>-x],
+    ["mySliderB2", "sliderValueB2", 0, 100, 50, "PanX:", "SliderPanX", (x) => -x],
     ["mySliderB3", "sliderValueB3", 0, 100, 50, "PanY", "SliderPanY", (x) => -x],
-    ["mySliderB4", "sliderValueB4", 0, 100, 50, "RotationY", "SliderRotationY",(x)=>-x*Math.PI/180],
-    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot", (x) => x * Math.PI / 180],],
+    ["mySliderB4", "sliderValueB4", 0, 100, 50, "RotationY", "SliderRotationY", (x) => -x * Math.PI / 180],
+    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot", (x) => x * Math.PI / 180], ,
     ["mySliderB6", "sliderValueB6", 0, 100, 50, "unused", ""]
-]
+];
 
-destructiveSliders = ["SliderShift", "SliderEccentricity","SliderNumberOfTeeth"]
+destructiveSliders = ["SliderShift", "SliderEccentricity", "SliderNumberOfTeeth"]
 
 slider_ids=[]
 function set_sliders(sliders)
 {
-    for (let sliderdef of sliders) {
+    for (let sliderdef in sliders) {
         var slider = document.getElementById(sliderdef[0])
         var display = document.getElementById(sliderdef[1]);
         slider_ids.push(
@@ -66,6 +66,6 @@ function check_sliders()
     }
 }
 
-ReadJson("clock").animate();
+ConfigureMechanism(configuration_json).animate();
 
 

@@ -26,10 +26,12 @@ class Shape3D extends Util {
     add(child) {
         this.children[child.Name] = child;
         child.Parent = this;
-        if (obj instanceof Camera3D) {
+        if (child instanceof Root3D) {
+        }
+        else if (child instanceof Camera3D) {
             this.camera = child.object3D;
         }
-        else if (obj instanceof Shape3D) {
+        else if (child instanceof Shape3D) {
             this.object3D.add(child.object3D);
         }
     }
@@ -284,7 +286,7 @@ class ExtrudedGear3D extends Shape3D {
     }
 
     extrude() {
-        const extruder = new Extrude(shape, this.getParameter("Depth"));
+        const extruder = new Extrude(shape, this.getParameter("Thickness"));
         const mesh = extruder.getMesh(this.getParameter("Color"));
         this.set(mesh);
     }
@@ -321,7 +323,7 @@ class SimpleGear3D extends ExtrudedGear3D {
     }
 }
 
-class FrameGear3D extends FrameGear3D {
+class FrameGear3D extends ExtrudedGear3D {
     constructor(json) {
         super(json);
         build();
@@ -456,9 +458,7 @@ class DirectionalLight3D extends Shape3D {
     }
 }
 
-function ReadJson(name) {
-
-    import data from './data.json' assert { type: 'json' };
+function ConfigureMechanism(data) {
     for (var partdef of data) {
         let parentPath;
         var part = CreatePart(partdef); 
@@ -496,6 +496,7 @@ function CreatePart(json) {
         case "Epicyclic":
             return new Epicyclic3D(json);
         default:
+            console.error("Unknown part type: " + json.Type);
             return null;
     }
 }
