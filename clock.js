@@ -44,24 +44,26 @@ configuration_json = [
         "Type": "SimpleGear",
         "Name": "gear1",
         "Module": "Module",
-        "Shift": "SliderToothShift",
-        "NumberOfTeeth": "SliderNumberOfTeeth",
+        "Shift": "neg(SliderToothShift)",
+        "NumberOfTeeth": "max(4,SliderNumberOfTeeth)",
         "Color": "#0077ff",
         "Position": [0, 0, 0],
         "Slot": "Slot1",
         "RotationZ": "radians(SliderGearRot)",
 
     },
-//    {
-//        "Type": "SimpleGear",
-//        "Name": "gear2",
-//        "Module": "Module",
-//        "Shift": "SliderToothShift",
-//        "NumberOfTeeth": "SliderNumberOfTeeth",
-//        "Color": "#0077ff",
-//        "Slot": "Slot1",
-//        "PositionX": "mult(gear1.Rpitch, 2)"
-//    },
+    {
+        "Type": "SimpleGear",
+        "Name": "gear2",
+        "Module": "Module",
+        "Shift": "sum(.5,SliderToothShift)",
+        "NumberOfTeeth": "max(4,SliderNumberOfTeeth)",
+        "Color": "#00ff88",
+        "Slot": "Slot1",
+        "PositionX": "mult(gear1.Rpitch, 2)",
+        "RotationZ": "radians(neg(SliderGearRot))"
+
+    },
 //    {
 //        "Type": "PlanetaryGear",
 //        "Name": "pgear",

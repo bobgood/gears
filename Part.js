@@ -299,8 +299,6 @@ class Shape3D extends Util {
                     return scope.runFunction(scopes[i], this.resolveParams(params));
                 }
 
-            } else {
-                return defaultValue;
             }
         }
 

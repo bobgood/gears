@@ -10,7 +10,7 @@ slider_defs = [
     ["mySlider3", "sliderValue3", 0, 100, 50, "Eccentricity", "SliderEccentricity", (x) => x / 100],
     ["mySlider4", "sliderValue4", 0, 100, 50, "unused", ""],
     ["mySlider5", "sliderValue5", 0, 100, 50, "unused", ""],
-    ["mySlider6", "sliderValue6", 0, 100, 12, "Teeth Count", "SliderNumberOfTeeth"],
+    ["mySlider6", "sliderValue6", 4, 200, 12, "Teeth Count", "SliderNumberOfTeeth"],
 
     ["mySliderB1", "sliderValueB1", 0, 100, 50, "zoom:", "SliderZoom"],
     ["mySliderB2", "sliderValueB2", -50, 50, 0, "PanX:", "SliderPanX", (x) => -x],
@@ -20,7 +20,7 @@ slider_defs = [
     ["mySliderB6", "sliderValueB6", 0, 100, 50, "unused", ""]
 ];
 
-destructiveSliders = ["SliderShift", "SliderEccentricity", "SliderNumberOfTeeth"]
+destructiveSliders = ["SliderShift", "SliderEccentricity", "SliderNumberOfTeeth","SliderToothShift"]
 
 slider_ids=[]
 function set_sliders()
@@ -44,6 +44,7 @@ function set_sliders()
     }
 }
 set_sliders();
+var hold = true;
 
 function check_sliders()
 {
@@ -62,7 +63,7 @@ function check_sliders()
             if (variable != "") {
                 root_object[variable] = value;
             }
-            if (variable in destructiveSliders) {
+            if (!hold && destructiveSliders.includes(variable)) {
                 root_object.rebuild();
             }
         }
@@ -74,6 +75,7 @@ function animate() {
     check_sliders();
 
     root_object.animate();
+    hold = false;
 }
 
 function start() {
@@ -84,6 +86,12 @@ function start() {
     ConfigureMechanism(configuration_json, grenderer)
 
     animate();
+}
+
+function test() {
+    var g2 = root_object.childrenmap["gear2"];
+    var v = g2.getParameter("mult(gear1.Rpitch, 2)");
+    console.log(v);
 }
 
 start();
