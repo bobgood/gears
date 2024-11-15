@@ -48,7 +48,8 @@ class Shape3D extends Util {
     }
 
     color(c) {
-        if (cs = preset_colors[c] === undefined) {
+        let cs;
+        if ((cs = preset_colors[c]) === undefined) {
             cs = c;
         }
 
@@ -60,16 +61,13 @@ class Shape3D extends Util {
 
     // called if an object was rebuilt
     set(ob) {
-        console.log("set for " + this.Name);
         if (this.object3D !== null && this.object3D !==undefined) {
             this.Parent.object3D.remove(this.object3D);
         }
 
-        console.log("parent is " + this.Parent.Name);
-
         this.object3D = ob;
         this.Parent.object3D.add(this.object3D);
-        move();
+        this.move1();
     }
 
     reset_cache() {
@@ -154,13 +152,20 @@ class Shape3D extends Util {
     lookupParameter(field, defaultValue = null) {
         let r;
         if (r = this.cache[field] === undefined) {
-            r = this["r"];
+            r = this[field];
             if (typeof r === 'string') {
+                if (r.startsWith('#')) {
+                    return r;
+                }
+
                 r = this.getParameter(r, defaultValue);
                 this.cache[field] = r;
                 return r;
             }
             else {
+                if (r === undefined) {
+                    return defaultValue;
+                }
                 return r;
             }
         }
@@ -175,6 +180,7 @@ class Shape3D extends Util {
         return args;
 
     }
+
     runFunction(name, args) {
         return this[name](args);
     }
@@ -219,6 +225,12 @@ class Shape3D extends Util {
             // 3) named parameter(if last and no parameters), 
             if (i == scopes.length - 1) {
                 if (params === null) {
+                    while (scope[scopes[i]] === scopes[i]) {
+                        scope = scope.Parent;
+                        if (scope === null) {
+                            return defaultValue;
+                        }
+                    }
                     return scope.lookupParameter(scopes[i], defaultValue);
                 }
                 else {
@@ -226,19 +238,12 @@ class Shape3D extends Util {
                     return scope.runFunction(scopes[i], this.resolveParams(params));
                 }
 
-            }
-
-            else if (i === scopes.length - 1 && params === null) {
-                return readParameter(scope[scopes[i]], scopes[i], defaultValue);
-            } else if (i === scopes.length - 1 && params !== null) {
-                return readParameter(scope[scopes[i]](params), scopes[i], defaultValue);
-            } else if (scope[scopes[i]] !== undefined) {
-                scope = scope[scopes[i]];
             } else {
                 return defaultValue;
             }
         }
-        return readParameter(this[text], text, defaultValue);
+
+        return defaultValue;
     }
 }
 
@@ -279,6 +284,7 @@ class ExtrudedGear3D extends Shape3D {
             return;
         }
 
+        let v;
         if (v = this.getParameter("Color")) {
             this.object3D.material.color.set(this.color(v));
         }
@@ -294,6 +300,7 @@ class ExtrudedGear3D extends Shape3D {
     }
 
     extrude() {
+        console.log(this.Shape2D);
         const extruder = new Extrude(this.Shape2D, this.getParameter("Thickness"));
         const mesh = extruder.getMesh(this.getParameter("Color"));
         this.set(mesh);
@@ -509,146 +516,146 @@ function CreatePart(json) {
 }
 
 preset_colors = {
-    "black": "#000000",
-    "white": "#ffffff",
-    "red": "#ff0000",
-    "green": "#00ff00",
-    "blue": "#0000ff",
-    "yellow": "#ffff00",
-    "cyan": "#00ffff",
-    "magenta": "#ff00ff",
-    "orange": "#ffa500",
-    "purple": "#800080",
-    "pink": "#ffc0cb",
-    "brown": "#8b4513",
-    "grey": "#808080",
-    "lightGrey": "#d3d3d3",
-    "darkGrey": "#a9a9a9",
-    "lightBlue": "#add8e6",
-    "darkBlue": "#00008b",
-    "lightGreen": "#90ee90",
-    "darkGreen": "#006400",
-    "lightRed": "#ff7f7f",
-    "darkRed": "#8b0000",
-    "gold": "#ffd700",
-    "silver": "#c0c0c0",
-    "teal": "#008080",
-    "navy": "#000080",
-    "olive": "#808000",
-    "maroon": "#800000",
-    "lime": "#00ff00",
-    "indigo": "#4b0082",
-    "violet": "#ee82ee",
-    "black": "#000000",
-    "white": "#ffffff",
-    "red": "#ff0000",
-    "green": "#00ff00",
-    "blue": "#0000ff",
-    "yellow": "#ffff00",
-    "cyan": "#00ffff",
-    "magenta": "#ff00ff",
-    "orange": "#ffa500",
-    "purple": "#800080",
-    "pink": "#ffc0cb",
-    "brown": "#8b4513",
-    "grey": "#808080",
-    "lightGrey": "#d3d3d3",
-    "darkGrey": "#a9a9a9",
-    "lightBlue": "#add8e6",
-    "darkBlue": "#00008b",
-    "lightGreen": "#90ee90",
-    "darkGreen": "#006400",
-    "lightRed": "#ff7f7f",
-    "darkRed": "#8b0000",
-    "gold": "#ffd700",
-    "silver": "#c0c0c0",
-    "teal": "#008080",
-    "navy": "#000080",
-    "olive": "#808000",
-    "maroon": "#800000",
-    "lime": "#00ff00",
-    "indigo": "#4b0082",
-    "violet": "#ee82ee",
-    "turquoise": "#40e0d0",
-    "salmon": "#fa8072",
-    "khaki": "#f0e68c",
-    "coral": "#ff7f50",
-    "ivory": "#fffff0",
-    "lavender": "#e6e6fa",
-    "peachPuff": "#ffdab9",
-    "orchid": "#da70d6",
-    "plum": "#dda0dd",
-    "sienna": "#a0522d",
-    "skyBlue": "#87ceeb",
-    "seaGreen": "#2e8b57",
-    "slateBlue": "#6a5acd",
-    "springGreen": "#00ff7f",
-    "steelBlue": "#4682b4",
-    "tan": "#d2b48c",
-    "thistle": "#d8bfd8",
-    "wheat": "#f5deb3",
-    "mintCream": "#f5fffa",
-    "ghostWhite": "#f8f8ff",
-    "beige": "#f5f5dc",
-    "honeydew": "#f0fff0",
-    "aliceBlue": "#f0f8ff",
-    "antiqueWhite": "#faebd7",
-    "aquamarine": "#7fffd4",
-    "azure": "#f0ffff",
-    "blanchedAlmond": "#ffebcd",
-    "burlyWood": "#deb887",
-    "chartreuse": "#7fff00",
-    "chocolate": "#d2691e",
-    "crimson": "#dc143c",
-    "darkCyan": "#008b8b",
-    "darkGoldenrod": "#b8860b",
-    "darkKhaki": "#bdb76b",
-    "darkMagenta": "#8b008b",
-    "darkOliveGreen": "#556b2f",
-    "darkOrange": "#ff8c00",
-    "darkOrchid": "#9932cc",
-    "darkSalmon": "#e9967a",
-    "darkSeaGreen": "#8fbc8f",
-    "darkSlateBlue": "#483d8b",
-    "darkSlateGray": "#2f4f4f",
-    "dodgerBlue": "#1e90ff",
-    "firebrick": "#b22222",
-    "floralWhite": "#fffaf0",
-    "forestGreen": "#228b22",
-    "gainsboro": "#dcdcdc",
-    "hotPink": "#ff69b4",
-    "indianRed": "#cd5c5c",
-    "lightCoral": "#f08080",
-    "lightCyan": "#e0ffff",
-    "lightGoldenrodYellow": "#fafad2",
-    "lightPink": "#ffb6c1",
-    "lightSalmon": "#ffa07a",
-    "mediumAquamarine": "#66cdaa",
-    "mediumBlue": "#0000cd",
-    "mediumOrchid": "#ba55d3",
-    "mediumPurple": "#9370db",
-    "mediumSeaGreen": "#3cb371",
-    "mediumSlateBlue": "#7b68ee",
-    "mediumSpringGreen": "#00fa9a",
-    "mediumTurquoise": "#48d1cc",
-    "mediumVioletRed": "#c71585",
-    "mistyRose": "#ffe4e1",
-    "moccasin": "#ffe4b5",
-    "navajoWhite": "#ffdead",
-    "oldLace": "#fdf5e6",
-    "paleGoldenrod": "#eee8aa",
-    "paleGreen": "#98fb98",
-    "paleTurquoise": "#afeeee",
-    "paleVioletRed": "#db7093",
-    "papayaWhip": "#ffefd5",
-    "powderBlue": "#b0e0e6",
-    "rosyBrown": "#bc8f8f",
-    "royalBlue": "#4169e1",
-    "saddleBrown": "#8b4513",
-    "sandyBrown": "#f4a460",
-    "seaShell": "#fff5ee",
-    "snow": "#fffafa",
-    "tomato": "#ff6347",
-    "yellowGreen": "#9acd32"
+    "#black": "#000000",
+    "#white": "#ffffff",
+    "#red": "#ff0000",
+    "#green": "#00ff00",
+    "#blue": "#0000ff",
+    "#yellow": "#ffff00",
+    "#cyan": "#00ffff",
+    "#magenta": "#ff00ff",
+    "#orange": "#ffa500",
+    "#purple": "#800080",
+    "#pink": "#ffc0cb",
+    "#brown": "#8b4513",
+    "#grey": "#808080",
+    "#lightGrey": "#d3d3d3",
+    "#darkGrey": "#a9a9a9",
+    "#lightBlue": "#add8e6",
+    "#darkBlue": "#00008b",
+    "#lightGreen": "#90ee90",
+    "#darkGreen": "#006400",
+    "#lightRed": "#ff7f7f",
+    "#darkRed": "#8b0000",
+    "#gold": "#ffd700",
+    "#silver": "#c0c0c0",
+    "#teal": "#008080",
+    "#navy": "#000080",
+    "#olive": "#808000",
+    "#maroon": "#800000",
+    "#lime": "#00ff00",
+    "#indigo": "#4b0082",
+    "#violet": "#ee82ee",
+    "#black": "#000000",
+    "#white": "#ffffff",
+    "#red": "#ff0000",
+    "#green": "#00ff00",
+    "#blue": "#0000ff",
+    "#yellow": "#ffff00",
+    "#cyan": "#00ffff",
+    "#magenta": "#ff00ff",
+    "#orange": "#ffa500",
+    "#purple": "#800080",
+    "#pink": "#ffc0cb",
+    "#brown": "#8b4513",
+    "#grey": "#808080",
+    "#lightGrey": "#d3d3d3",
+    "#darkGrey": "#a9a9a9",
+    "#lightBlue": "#add8e6",
+    "#darkBlue": "#00008b",
+    "#lightGreen": "#90ee90",
+    "#darkGreen": "#006400",
+    "#lightRed": "#ff7f7f",
+    "#darkRed": "#8b0000",
+    "#gold": "#ffd700",
+    "#silver": "#c0c0c0",
+    "#teal": "#008080",
+    "#navy": "#000080",
+    "#olive": "#808000",
+    "#maroon": "#800000",
+    "#lime": "#00ff00",
+    "#indigo": "#4b0082",
+    "#violet": "#ee82ee",
+    "#turquoise": "#40e0d0",
+    "#salmon": "#fa8072",
+    "#khaki": "#f0e68c",
+    "#coral": "#ff7f50",
+    "#ivory": "#fffff0",
+    "#lavender": "#e6e6fa",
+    "#peachPuff": "#ffdab9",
+    "#orchid": "#da70d6",
+    "#plum": "#dda0dd",
+    "#sienna": "#a0522d",
+    "#skyBlue": "#87ceeb",
+    "#seaGreen": "#2e8b57",
+    "#slateBlue": "#6a5acd",
+    "#springGreen": "#00ff7f",
+    "#steelBlue": "#4682b4",
+    "#tan": "#d2b48c",
+    "#thistle": "#d8bfd8",
+    "#wheat": "#f5deb3",
+    "#mintCream": "#f5fffa",
+    "#ghostWhite": "#f8f8ff",
+    "#beige": "#f5f5dc",
+    "#honeydew": "#f0fff0",
+    "#aliceBlue": "#f0f8ff",
+    "#antiqueWhite": "#faebd7",
+    "#aquamarine": "#7fffd4",
+    "#azure": "#f0ffff",
+    "#blanchedAlmond": "#ffebcd",
+    "#burlyWood": "#deb887",
+    "#chartreuse": "#7fff00",
+    "#chocolate": "#d2691e",
+    "#crimson": "#dc143c",
+    "#darkCyan": "#008b8b",
+    "#darkGoldenrod": "#b8860b",
+    "#darkKhaki": "#bdb76b",
+    "#darkMagenta": "#8b008b",
+    "#darkOliveGreen": "#556b2f",
+    "#darkOrange": "#ff8c00",
+    "#darkOrchid": "#9932cc",
+    "#darkSalmon": "#e9967a",
+    "#darkSeaGreen": "#8fbc8f",
+    "#darkSlateBlue": "#483d8b",
+    "#darkSlateGray": "#2f4f4f",
+    "#dodgerBlue": "#1e90ff",
+    "#firebrick": "#b22222",
+    "#floralWhite": "#fffaf0",
+    "#forestGreen": "#228b22",
+    "#gainsboro": "#dcdcdc",
+    "#hotPink": "#ff69b4",
+    "#indianRed": "#cd5c5c",
+    "#lightCoral": "#f08080",
+    "#lightCyan": "#e0ffff",
+    "#lightGoldenrodYellow": "#fafad2",
+    "#lightPink": "#ffb6c1",
+    "#lightSalmon": "#ffa07a",
+    "#mediumAquamarine": "#66cdaa",
+    "#mediumBlue": "#0000cd",
+    "#mediumOrchid": "#ba55d3",
+    "#mediumPurple": "#9370db",
+    "#mediumSeaGreen": "#3cb371",
+    "#mediumSlateBlue": "#7b68ee",
+    "#mediumSpringGreen": "#00fa9a",
+    "#mediumTurquoise": "#48d1cc",
+    "#mediumVioletRed": "#c71585",
+    "#mistyRose": "#ffe4e1",
+    "#moccasin": "#ffe4b5",
+    "#navajoWhite": "#ffdead",
+    "#oldLace": "#fdf5e6",
+    "#paleGoldenrod": "#eee8aa",
+    "#paleGreen": "#98fb98",
+    "#paleTurquoise": "#afeeee",
+    "#paleVioletRed": "#db7093",
+    "#papayaWhip": "#ffefd5",
+    "#powderBlue": "#b0e0e6",
+    "#rosyBrown": "#bc8f8f",
+    "#royalBlue": "#4169e1",
+    "#saddleBrown": "#8b4513",
+    "#sandyBrown": "#f4a460",
+    "#seaShell": "#fff5ee",
+    "#snow": "#fffafa",
+    "#tomato": "#ff6347",
+    "#yellowGreen": "#9acd32"
 };
 

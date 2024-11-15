@@ -97,8 +97,8 @@ configuration_json = [
     {
         "Type": "FrameGear",
         "Name": "fgear",
-        "Module": "@Module",
-        "NumberOfTeeth": 20,
+        "Module": "Module",
+        "NumberOfTeeth": "SliderNumberOfTeeth",
         "Color": "0x0077ff",
         "Position": [0, 0, 0],
         "FrameRadius": "max(5,mult(gear.Rdedendum),0.7)",
