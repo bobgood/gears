@@ -1,0 +1,42 @@
+[
+  {
+    "Type": "Root",
+    "Name": "Root",
+    "Module": 1,
+    "PressureAngle": 20,
+    "Shift": 0,
+    "Depth": 2,
+    "Slot1": {
+      "HoleRadius": 2,
+      "SlotWidth": 1,
+      "SlotDepth": 2.5
+    },
+    "SlotShift": 0,
+    
+  },
+  {
+    "Type": "SimpleGear3D",
+    "Name": "gear1",
+    "Module": "@Module",
+    "NumberOfTeeth": 20,
+    "Color": "0x0000ff",
+    "Position": [ 0, 0, 0 ],
+    "Slot": "@Slot1"
+
+  },
+  {
+    "Type": "FrameGear3D",
+    "Name": "fgear",
+    "Module": "@Module",
+    "NumberOfTeeth": 20,
+    "Color": "0x0000ff",
+    "Position": [ 0, 0, 0 ],
+    "FrameRadius": 10,
+    "NumberOfSegments": 3,
+
+    "FrameShift": 0,
+    "HoleRadius": 2,
+    "Tolerance": .6
+    }
+
+]

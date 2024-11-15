@@ -8,11 +8,11 @@ class Shape2D {
         this.Cuts = [];
     }
 }
-class Gear extends Shape2D {
-    constructor(module, numTeeth, pressureAngle, shift) {
+class Gear2D extends Shape2D {
+    constructor(module, numberOfTeeth, pressureAngle, shift) {
         super();
         this.Module = module;
-        this.NumTeeth = numTeeth;
+        this.NumberOfTeeth = numberOfTeeth;
         this.PressureAngle = pressureAngle;
 
         // shift the zero angle of the gear by shift teeth distances
@@ -53,7 +53,7 @@ class Gear extends Shape2D {
         }
 
         var wangle = Math.asin(w / r / 2);
-        var tshift = slot_shift * Math.PI * 2 / this.NumTeeth;
+        var tshift = slot_shift * Math.PI * 2 / this.NumberOfTeeth;
         var r2a= Math.sqrt(r2*r2+w*w/4);
         var wangle2 = Math.asin(w / r2a / 2);
         var points = [];
@@ -152,7 +152,7 @@ class Gear extends Shape2D {
         for (var i = 0; i < this.Base_involute_curve.length; i++) {
             var tpnt = this.rotate_point({ x: 0, y: 0 }, this.Base_involute_curve[i], +this.theta_cross - this.dtheta / 2);
             var angle1 = Math.atan2(tpnt.y, tpnt.x);
-            if (angle1 < Math.PI / this.NumTeeth && tpnt.y > 0) {
+            if (angle1 < Math.PI / this.NumberOfTeeth && tpnt.y > 0) {
                 involute_pts.push(this.Base_involute_curve[i]);
             }
         }
@@ -172,7 +172,7 @@ class Gear extends Shape2D {
 
 
     pitch_diameter() {
-        return this.Module * this.NumTeeth;
+        return this.Module * this.NumberOfTeeth;
     }
 
     base_diameter() {
@@ -188,27 +188,28 @@ class Gear extends Shape2D {
     }
 
     tooth_thickness() {
-        return Math.PI * this.pitch_diameter() / (2.0 * this.NumTeeth);
+        return Math.PI * this.pitch_diameter() / (2.0 * this.NumberOfTeeth);
     }
 
 }
 
-class SimpleGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, shift) {
-        super(module, numTeeth, pressureAngle, shift);
+class SimpleGear2D extends Gear2D {
+    constructor(module, numberOfTeeth, pressureAngle, shift) {
+        super(module, numberOfTeeth, pressureAngle, shift);
         this.generate_simple_gear();
-
     }
+
+    
 
     generate_simple_gear() {
 
         let pt;
         var outline = [];
-        for (var i = 0; i < this.NumTeeth; i++) {
+        for (var i = 0; i < this.NumberOfTeeth; i++) {
             var inline = [{ x: 0, y: 0 }];
-            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
-            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
-            var theta3 = (i + 1 + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) - this.theta_cross + this.dtheta / 2;
+            var theta3 = (i + 1 + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
             var tooth = [];
 
             for (var j = 0; j < this.Involute.length; j++) {
@@ -235,11 +236,11 @@ class SimpleGear extends Gear {
         this.Outlines.push(outline);
     }
 }
-class FrameGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, shift, frameRadius, numSegments, frameShift, holeRadius, tolerance=0,N=20) { 
-        super(module, Math.max(24,numTeeth), pressureAngle, shift);
+class FrameGear2D extends Gear2D {
+    constructor(module, numberOfTeeth, pressureAngle, shift, frameRadius, numSegments, frameShift, holeRadius, tolerance=0,N=20) { 
+        super(module, Math.max(24,numberOfTeeth), pressureAngle, shift);
         this.FrameRadius = frameRadius;
-        this.NumSegments = Math.min(4,numSegments);
+        this.NumberOfSegments = Math.min(4,numSegments);
         this.FrameShift = frameShift;
         this.HoleRadius = holeRadius;
         this.Tolerance = tolerance;
@@ -252,8 +253,8 @@ class FrameGear extends Gear {
     }
 
     meet_distance(meet, tooth) {
-        var omega = meet * Math.PI / this.NumSegments + this.FrameShift * Math.PI * 2 / this.NumTeeth;
-        var theta = tooth * 2 * Math.PI / this.NumTeeth + this.Shift * Math.PI * 2 / this.NumTeeth
+        var omega = meet * Math.PI / this.NumberOfSegments + this.FrameShift * Math.PI * 2 / this.NumberOfTeeth;
+        var theta = tooth * 2 * Math.PI / this.NumberOfTeeth + this.Shift * Math.PI * 2 / this.NumberOfTeeth
         var diff = omega - theta;
         while (diff <= -Math.PI) diff += 2 * Math.PI;
         while (diff >= Math.PI) diff -= 2 * Math.PI;
@@ -265,8 +266,8 @@ class FrameGear extends Gear {
         this.meets = [];
         this.inner_meets = [];
         this.meets_angle = [];
-        for (var i = 0; i < this.NumSegments*2; i++) {
-            var omega = i * Math.PI / this.NumSegments + this.FrameShift * Math.PI * 2 / this.NumTeeth;
+        for (var i = 0; i < this.NumberOfSegments*2; i++) {
+            var omega = i * Math.PI / this.NumberOfSegments + this.FrameShift * Math.PI * 2 / this.NumberOfTeeth;
             this.meets_angle.push(omega);
             this.meets.push(this.rotate_point({ x: 0, y: 0 }, { x: this.FrameRadius, y: 0 }, omega));
             if (i % 2 == 0) {
@@ -275,10 +276,10 @@ class FrameGear extends Gear {
         }
 
         this.meets_map = [];
-        for (var i = 0; i < this.NumTeeth; i++) {
+        for (var i = 0; i < this.NumberOfTeeth; i++) {
             var max = 10;
             var max_j = -1;
-            for (var j = 0; j < this.NumSegments*2; j++) {
+            for (var j = 0; j < this.NumberOfSegments*2; j++) {
                 var dist = this.meet_distance(j, i);
                 if (dist < max) {
                     max = dist; max_j = j;
@@ -288,8 +289,8 @@ class FrameGear extends Gear {
         }
 
         // find the teeth that are furthest from a hole
-        for (var i = 0; i < this.NumTeeth; i++) {
-            var i2 = (i + 1) % this.NumTeeth;
+        for (var i = 0; i < this.NumberOfTeeth; i++) {
+            var i2 = (i + 1) % this.NumberOfTeeth;
             if (this.meets_map[i][0] != this.meets_map[i2][0])
             {
                 if (this.meets_map[i][2] > this.meets_map[i2][2]) {
@@ -309,12 +310,12 @@ class FrameGear extends Gear {
 
         let pt;
         var outline = [];
-        for (var i = 0; i < this.NumTeeth; i++) {
+        for (var i = 0; i < this.NumberOfTeeth; i++) {
             var meet_pt = this.meets[this.meets_map[i][0]];
             var inline = [meet_pt];
-            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
-            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
-            var theta3 = (i + 1 + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) - this.theta_cross + this.dtheta / 2;
+            var theta3 = (i + 1 + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
             var tooth = [];
 
             for (var j = 0; j < this.Involute.length; j++) {
@@ -346,13 +347,13 @@ class FrameGear extends Gear {
         }
 
         var center = { x: 0, y: 0 };
-        for (j = 0; j < this.NumSegments * 2; j++) {
-            var j2 = (j + 1) % (this.NumSegments * 2);
+        for (j = 0; j < this.NumberOfSegments * 2; j++) {
+            var j2 = (j + 1) % (this.NumberOfSegments * 2);
             var inner = [center, this.meets[j], this.meets[j2]];
             this.Faces.push(inner);
         }
 
-        for (j = 0; j < this.NumSegments; j++) {
+        for (j = 0; j < this.NumberOfSegments; j++) {
             var hole_center = this.meets[j * 2];
 
             var circle = [];
@@ -365,7 +366,7 @@ class FrameGear extends Gear {
                 circle.push(pt);
             }
             this.Cuts.push(circle);
-            var j2 = (j + 1) % this.NumSegments;
+            var j2 = (j + 1) % this.NumberOfSegments;
 
             var r1 = this.FrameRadius + this.HoleRadius + this.Tolerance;
             var r2 = this.Rdedendum - this.Tolerance;
@@ -390,11 +391,11 @@ class FrameGear extends Gear {
 
 }
 
-class PlanetaryGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, shift, outsideRadius = 0, N=200) {
-        super(module, Math.max(20, numTeeth), pressureAngle, shift);
+class PlanetaryGear2D extends Gear2D {
+    constructor(module, numberOfTeeth, pressureAngle, shift, outsideRadius = 0, N=200) {
+        super(module, Math.max(20, numberOfTeeth), pressureAngle, shift);
         this.OutsideRadius = Math.max(outsideRadius, this.Raddendum + 1 * module)
-        this.N = Math.round(N / numTeeth);
+        this.N = Math.round(N / numberOfTeeth);
 
         // these values were just used to build the teeth,
         // this.Rpitch 
@@ -411,10 +412,10 @@ class PlanetaryGear extends Gear {
         var outline = [];
         var innerOutline = [];
 
-        for (var i = 0; i < this.NumTeeth; i++) {
-            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
-            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
-            var theta3 = (i + this.Shift + 1) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+        for (var i = 0; i < this.NumberOfTeeth; i++) {
+            var theta = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
+            var theta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) - this.theta_cross + this.dtheta / 2;
+            var theta3 = (i + this.Shift + 1) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
             var opt = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta);
             var opt3 = this.rotate_point({ x: 0, y: 0 }, { x: this.OutsideRadius, y: 0 }, theta3);
             outline.push(opt);
@@ -461,9 +462,9 @@ class PlanetaryGear extends Gear {
     }
 }
 
-class EllipticalGear extends Gear {
-    constructor(module, numTeeth, pressureAngle, shift, eccentricity) {
-        super(module, Math.max(4 * Math.floor(numTeeth / 4, 8)), 0, pressureAngle);
+class EllipticalGear2D extends Gear2D {
+    constructor(module, numberOfTeeth, pressureAngle, shift, eccentricity) {
+        super(module, Math.max(4 * Math.floor(numberOfTeeth / 4, 8)), 0, pressureAngle);
         this.Shift = shift;
         this.Eccentricity = eccentricity;
         this.A = solveForSemiMajorAxis(Math.PI * 2 * this.Rpitch, this.Eccentricity, this.Rpitch);
@@ -554,13 +555,13 @@ class EllipticalGear extends Gear {
 
         let pt;
         var outline = [];
-        for (var i = 0; i < this.NumTeeth; i++) {
+        for (var i = 0; i < this.NumberOfTeeth; i++) {
             var inline = [{ x: 0, y: 0 }];
-            var ctheta = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var ctheta = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
             var theta = this.convert_circle_angle_to_ellipse(ctheta);
-            var ctheta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumTeeth) - this.theta_cross + this.dtheta / 2;
+            var ctheta2 = (i + this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) - this.theta_cross + this.dtheta / 2;
             var theta2 = this.convert_circle_angle_to_ellipse(ctheta2);
-            var ctheta3 = (i +1+ this.Shift) * Math.PI * 2.0 / (this.NumTeeth) + this.theta_cross - this.dtheta / 2;
+            var ctheta3 = (i +1+ this.Shift) * Math.PI * 2.0 / (this.NumberOfTeeth) + this.theta_cross - this.dtheta / 2;
             var theta3 = this.convert_circle_angle_to_ellipse(ctheta3);
             var tooth = [];
 
@@ -588,7 +589,7 @@ class EllipticalGear extends Gear {
     }
 }
 
-class Frame extends Shape2D {
+class Frame2D extends Shape2D {
     constructor(radius, width, segments,hole_radius, shift=0, N = 200) {
         super();
         this.Radius = radius;
