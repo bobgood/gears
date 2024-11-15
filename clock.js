@@ -5,6 +5,7 @@ configuration_json = [
         "Module": 1,
         "PressureAngle": "radians(20)",
         "Shift": 0,
+        "N": 100,
         "Thickness": 2,
         "Slot1": {
             "HoleRadius": 2,
