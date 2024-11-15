@@ -21,12 +21,18 @@ class Shape3D extends Util {
         this.childrenmap = {};
         this.cache = {};
         this.Parent = null;
+        this.object3D = null;
     }
 
     add(child) {
         this.childrenmap[child.Name] = child;
-        child.Parent = this;
-        if (child.Type=="Root") {
+        if (child.Type != "Root") {
+            child.Parent = this;
+        }
+    }
+
+    connect(child) {
+        if (child.Type == "Root") {
         }
         else if (child instanceof Camera3D) {
             this.camera = child.object3D;
@@ -35,6 +41,7 @@ class Shape3D extends Util {
             this.object3D.add(child.object3D);
         }
     }
+
 
     rebuild() {
         root_object.rebuild_all = true;
@@ -53,9 +60,12 @@ class Shape3D extends Util {
 
     // called if an object was rebuilt
     set(ob) {
-        if (this.object3D !== null) {
+        console.log("set for " + this.Name);
+        if (this.object3D !== null && this.object3D !==undefined) {
             this.Parent.object3D.remove(this.object3D);
         }
+
+        console.log("parent is " + this.Parent.Name);
 
         this.object3D = ob;
         this.Parent.object3D.add(this.object3D);
@@ -196,8 +206,8 @@ class Shape3D extends Util {
 
             // 2) ancestors named child(if first), 
             if (i == 0) {
-                let parent;
-                while ((parent = scope.Parent) != null) {
+                let parent=scope;
+                while ((parent = parent.Parent) != null) {
                     if ((f1 = parent.childrenmap[scopes[i]]) !== undefined) {
                         scope = f1;
                         break;
@@ -459,10 +469,13 @@ function ConfigureMechanism(data) {
         else if ((parentPath = partdef.Parent) !== undefined) {
             var parent = root_object.getParameter(parentPath);
             parent.add(part);
+            part.build();
+            parent.connect(part);
         }
         else {
-            part.build();
             root_object.add(part);
+            part.build();
+            root_object.connect(part);
         }
     }
 
