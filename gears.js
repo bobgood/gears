@@ -17,34 +17,35 @@ class Gear2D extends Shape2D {
 
         // shift the zero angle of the gear by shift teeth distances
         this.Shift = shift;
+        if (module === undefined) throw new Error("module is undefined");
         if (shift === undefined) throw new Error("shift is undefined");
         if (numberOfTeeth === undefined) throw new Error("numberOfTeeth is undefined");
         if (numberOfTeeth < 4) throw new Error("numberOfTeeth is too small");
-        if (pressureAngle === undefined) throw new Error("pressureAngle is undefined");
+        if (this.PressureAngle === undefined) throw new Error("pressureAngle is undefined");
 
         // Rp aka r pitch
         this.Rpitch = this.pitch_diameter() / 2.0;
-        if (Rpitch === undefined) throw new Error("Rpitch is undefined");
+        if (this.Rpitch === undefined) throw new Error("Rpitch is undefined");
 
         // Rb aka r base
         this.Rbase = this.base_diameter() / 2.0;
-        if (Rbase === undefined) throw new Error("Rbase is undefined");
+        if (this.Rbase === undefined) throw new Error("Rbase is undefined");
 
         // Rd aka r dedendum aka r min
         this.Rdedendum = this.Rpitch - this.dedendum();
-        if (Rdedendum === undefined) throw new Error("Rdedendum is undefined");
+        if (this.Rdedendum === undefined) throw new Error("Rdedendum is undefined");
 
         // Ra aka r addendum aka r max
         this.Raddendum = this.Rpitch + this.addendum();
-        if (Raddendum === undefined) throw new Error("Raddendum is undefined");
+        if (this.Raddendum === undefined) throw new Error("Raddendum is undefined");
 
         // thickness of the tooth
         this.Ttooth = this.tooth_thickness();
-        if (Ttooth === undefined) throw new Error("Ttooth is undefined");
+        if (this.Ttooth === undefined) throw new Error("Ttooth is undefined");
 
         // smoothing points along the involute curve
         this.Smoothing = 20;
-        if (Smoothing === undefined) throw new Error("Smoothing is undefined");
+        if (this.Smoothing === undefined) throw new Error("Smoothing is undefined");
 
         // calculates the form of the involute curve
         this.Base_involute_curve = this.involute_curve();
@@ -151,11 +152,15 @@ class Gear2D extends Shape2D {
     }
 
     create_involute_coordinates() {
+        if (this.Rpitch === undefined) throw new Error("Rpitch is undefined");
+
         // find the crossing point of the involute curve with the pitch circle
         this.p_cross = this.involute_point(this.involute_bisect(this.Rpitch));
         this.theta_cross = Math.atan2(this.p_cross.y, this.p_cross.x);
         this.dtheta = this.Ttooth / this.Rpitch;
-
+        if (this.p_cross.y === undefined) throw new Error("p_cross.y is undefined");
+        if (this.theta_cross === undefined) throw new Error("theta_cross.y is undefined");
+        if (this.dtheta === undefined) throw new Error("dtheta.y is undefined");
 
         // compute whether the gear profile will self-intersect once patterned
         var involute_pts = [];
@@ -186,6 +191,7 @@ class Gear2D extends Shape2D {
     }
 
     base_diameter() {
+
         return this.pitch_diameter() * Math.cos(this.PressureAngle);
     }
 
@@ -206,13 +212,13 @@ class Gear2D extends Shape2D {
 class SimpleGear2D extends Gear2D {
     constructor(module, numberOfTeeth, pressureAngle, shift) {
         super(module, numberOfTeeth, pressureAngle, shift);
+        if (pressureAngle === undefined) throw new Error("pressureAngle is undefined");
         this.generate_simple_gear();
     }
 
     
 
     generate_simple_gear() {
-
         let pt;
         var outline = [];
         for (var i = 0; i < this.NumberOfTeeth; i++) {

@@ -151,7 +151,6 @@ class Shape3D extends Util {
 
     lookupParameter(field, defaultValue = null) {
         let r;
-        console.log("3", this.Name, field, this[field]);
 
         if (r = this.cache[field] === undefined) {
             r = this[field];
@@ -171,6 +170,8 @@ class Shape3D extends Util {
                 return r;
             }
         }
+
+        return r;
     }
 
     resolveParams(params) {
@@ -279,7 +280,6 @@ class Root3D extends Shape3D {
     }
 
     animate() {
-        check_sliders();
         if (this.rebuild_all) {
             this.rebuild1();
         }
@@ -324,6 +324,7 @@ class ExtrudedGear3D extends Shape3D {
     }
 }
 
+
 class SimpleGear3D extends ExtrudedGear3D {
     constructor(json) {
         super(json);
@@ -333,7 +334,7 @@ class SimpleGear3D extends ExtrudedGear3D {
         this.Shape2D = new SimpleGear2D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
-            this.getParameter("PressureAngle") * Math.PI / 180,
+            this.getParameter("PressureAngle"),
             this.getParameter("Shift"));
         var slot = this.getParameter("Slot");
         if (slot!=undefined && slot!=null) {
@@ -363,7 +364,7 @@ class FrameGear3D extends ExtrudedGear3D {
         this.Shape2D = new FrameGear2D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
-            this.getParameter("PressureAngle") * Math.PI / 180,
+            this.getParameter("PressureAngle"),
             this.getParameter("Shift"),
             this.getParameter("FrameRadius"),
             this.getParameter("NumberOfSegments"),
@@ -394,7 +395,7 @@ class PlanetaryGear3D extends ExtrudedGear3D {
         this.Shape2D = new PlanetaryGear3D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
-            this.getParameter("PressureAngle") * Math.PI / 180,
+            this.getParameter("PressureAngle"),
             this.getParameter("Shift"),
             this.getParameter("OusideRadius"),
         );
@@ -418,7 +419,7 @@ class EllipticalGear3D extends ExtrudedGear3D {
         this.Shape2D = new EllipticalGear3D(
             this.getParameter("Module"),
             this.getParameter("NumberOfTeeth"),
-            this.getParameter("PressureAngle") * Math.PI / 180,
+            this.getParameter("PressureAngle"),
             this.getParameter("Shift"),
             this.getParameter("Eccentricity")
         );
@@ -456,6 +457,8 @@ class Epicyclic3D extends Shape3D {
 class Camera3D extends Shape3D {
     constructor(json) {
         super(json);
+        this.object3D = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
     }
 
     build() {

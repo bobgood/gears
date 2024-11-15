@@ -47,15 +47,14 @@ function check_sliders()
 {
     for (var i = 0; i < slider_defs.length; i++) {
         var was = slider_ids[i].prev;
-        const value = Number(slider_ids[i].slider.value);
-        console.log("slider " + i + " " + value);
+        var value = Number(slider_ids[i].slider.value);
         slider_ids[i].prev = value;
         slider_ids[i].display.textContent = value;
         if (was != value) {
-            const variable = sliders[i][6];
-            if (sliders[i].length > 7)
+            const variable = slider_defs[i][6];
+            if (slider_defs[i].length > 7)
             {
-                lambda = sliders[i][7];
+                lambda = slider_defs[i][7];
                 value = lambda(value);
             }
             if (variable != "") {
@@ -68,6 +67,20 @@ function check_sliders()
     }
 }
 
-ConfigureMechanism(configuration_json).animate();
+function animate() {
+    requestAnimationFrame(animate);
+    check_sliders();
 
+    root_object.animate();
+}
 
+function start() {
+    if (root_object != null) {
+        root_object.reset_cache();
+    }
+    ConfigureMechanism(configuration_json)
+
+    animate();
+}
+
+start();
