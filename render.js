@@ -1,9 +1,7 @@
-// Set up the scene, camera, and renderer
+// Set up the renderer
 const grenderer = new THREE.WebGLRenderer();
 grenderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(grenderer.domElement);
-
-
 
 
 slider_defs = [
@@ -83,7 +81,7 @@ function start() {
         root_object.reset_cache();
         root_object.rebuild_all=true;
     }
-    ConfigureMechanism(configuration_json)
+    ConfigureMechanism(configuration_json, grenderer)
 
     animate();
 }

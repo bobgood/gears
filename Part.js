@@ -267,12 +267,13 @@ class Shape3D extends Util {
 }
 
 class Root3D extends Shape3D {
-    constructor(json) {
+    constructor(json,renderer) {
         super(json);
         this.object3D = new THREE.Scene();
         root_object = this;
         this.rebuild_all = false;
         this.camera = null;
+        this.renderer = renderer;
     }
 
     animate() {
@@ -283,8 +284,7 @@ class Root3D extends Shape3D {
         this.reset_cache();
         this.move1();
         this.rebuild_all = false;
-        //        this.renderer.render(this.object3D, this.camera);
-        grenderer.render(this.object3D, this.camera);
+        this.renderer.render(this.object3D, this.camera);
     }
 }
 
@@ -486,10 +486,10 @@ class DirectionalLight3D extends Shape3D {
     }
 }
 
-function ConfigureMechanism(data) {
+function ConfigureMechanism(data, renderer) {
     for (var partdef of data) {
         let parentPath;
-        var part = CreatePart(partdef); 
+        var part = CreatePart(partdef, renderer); 
         if (part.Type == "Root") { }
         else if ((parentPath = partdef.Parent) !== undefined) {
             var parent = root_object.getParameter(parentPath);
@@ -507,10 +507,10 @@ function ConfigureMechanism(data) {
     return root_object;
 }
 
-function CreatePart(json) {
+function CreatePart(json, renderer) {
     switch (json.Type) {
         case "Root":
-            return new Root3D(json);
+            return new Root3D(json, renderer);
         case "Camera":
             return new Camera3D(json);
         case "AmbientLight":
