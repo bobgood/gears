@@ -9,7 +9,9 @@ class Util {
     rsin(r, a) { return r * Math.sin(a); }
     dist(x, y) { return Math.sqrt(x * x + y * y); }
     mult(x, y) { return x * y; }
+    div(x, y) { return x / y; }
     ave(x, y) { return (x + y) / 2; }
+    sum(x, y) { return (x + y); }
     neg(x) { return -x; }
     max(a,b) { return Math.max(a,b); }
 }
@@ -108,23 +110,19 @@ class Shape3D extends Util {
         }
 
         if (v = this.getParameter("LookAtX")) {
-            this.object3D.lookAt.x = v;
+            this.lookAtX(v);
         }
 
-        if (v = this.getParameter("LookAt")) {
-            this.object3D.lookAt.x = v[0];
-            this.object3D.lookAt.y = v[1];
-            if (v.length > 2) {
-                this.object3D.lookAt.z = v[2];
-            }
+        if (v = this.getParameter("LookAtZoom")) {
+            this.lookAtZoom(v);
+        }
+
+        if (v = this.getParameter("LookAtAngle")) {
+            this.lookAtAngle(v);
         }
 
         if (v = this.getParameter("LookAtY")) {
-            this.object3D.lookAt.y = v;
-        }
-
-        if (v = this.getParameter("LookAtZ")) {
-            this.object3D.lookAt.z = v;
+            this.lookAtY(v);
         }
 
         if (v = this.getParameter("RotationX")) {
@@ -186,6 +184,13 @@ class Shape3D extends Util {
     }
 
     runFunction(name, args) {
+        for (var i = 0; i < args.length; i++)
+        {
+            if (args[i] == null || args[i] === undefined || (typeof args[i] === "number" && Number.isNaN(args[i]))) {
+                console.error("missing parameter " + i + " for function " + name+ " ("+args+")");
+            }
+        }
+
         var x = this[name](...args);
         return x;
     }
@@ -202,6 +207,38 @@ class Shape3D extends Util {
         return this.getParameter(sub[field], defaultValue);
     }
 
+    splitByCommasOutsideParens(input) {
+        const result = [];
+        let current = '';
+        let depth = 0;
+
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+
+            if (char === ',' && depth === 0) {
+                // Split only if we're not inside any parentheses
+                result.push(current.trim());
+                current = '';
+            } else {
+                // Adjust depth if we encounter parentheses
+                if (char === '(') {
+                    depth++;
+                } else if (char === ')') {
+                    depth--;
+                }
+                current += char;
+            }
+        }
+
+        // Add the last segment
+        if (current) {
+            result.push(current.trim());
+        }
+
+        return result;
+    }
+
+
     getParameter(text, defaultValue = null) {
         var f = parseFloat(text);
         if (!isNaN(f)) {
@@ -211,12 +248,17 @@ class Shape3D extends Util {
         var left = text;
         var params = null;
         const parenIndex = text.indexOf('(', 1);
-        if (parenIndex > 1 && text.charAt(text.length - 1) === ')')
+        if (parenIndex > 1) 
         {
+            if (text.charAt(text.length - 1) !== ')')
+            {
+                console.error("missing closing paren " + text);
+            }
             left = text.substring(0, parenIndex);
             const right = text.substring(parenIndex + 1, text.length - 1);
-            params = right.split(',');
+            params = this.splitByCommasOutsideParens(right);
         }
+
         var scopes = left.split('.');
         var scope = this;
         let f1;
@@ -315,7 +357,6 @@ class ExtrudedGear3D extends Shape3D {
     }
 
     extrude() {
-        console.log("extrude "+this.Name)
         const extruder = new Extrude(this.Shape2D, this.getParameter("Thickness"));
         const mesh = extruder.getMesh(this.getParameter("Color"));
         this.set(mesh);
@@ -457,8 +498,45 @@ class Camera3D extends Shape3D {
         super(json);
         this.object3D = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);;
         this.object3D.position.z = 5;
+        this.panX = 0;
+        this.panY = 0;
+        this.zoom = 0;
+        this.angle = 0;
+        this.view();
     }
 
+    view() {
+        const x = this.panX + this.zoom * Math.sin(this.angle);
+        const y = this.panY; // Optional slight vertical offset
+        const z = 0 + this.zoom * Math.cos(this.angle);
+
+        // Set the camera position
+        this.object3D.position.set(x, y, z);
+        const pan = new THREE.Vector3(this.panX, this.panY, 0);
+        // Make the camera look at the object's center
+        this.object3D.lookAt(pan);
+        console.log("lookat", x, y, z, this.panX, this.panY, this.angle, this.zoom)
+    }
+
+
+    lookAtX(x) {
+        this.panX = x;
+        this.view();
+    }
+
+    lookAtY(y) {
+        this.panY = y;
+        this.view();
+    }
+
+    lookAtZoom(z) {
+        this.zoom = z;
+        this.view();
+    }
+    lookAtAngle(z) {
+        this.angle = z;
+        this.view();
+    }
     build() {
 
     }

@@ -13,10 +13,10 @@ slider_defs = [
     ["mySlider6", "sliderValue6", 0, 100, 12, "Teeth Count", "SliderNumberOfTeeth"],
 
     ["mySliderB1", "sliderValueB1", 0, 100, 50, "zoom:", "SliderZoom"],
-    ["mySliderB2", "sliderValueB2", 0, 100, 50, "PanX:", "SliderPanX", (x) => -x],
-    ["mySliderB3", "sliderValueB3", 0, 100, 50, "PanY", "SliderPanY", (x) => -x],
-    ["mySliderB4", "sliderValueB4", 0, 100, 50, "RotationY", "SliderRotationY", (x) => -x * Math.PI / 180],
-    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot", (x) => x * Math.PI / 180], 
+    ["mySliderB2", "sliderValueB2", -50, 50, 0, "PanX:", "SliderPanX", (x) => -x],
+    ["mySliderB3", "sliderValueB3", -50, 50, 0, "PanY", "SliderPanY", (x) => -x],
+    ["mySliderB4", "sliderValueB4", -180, 180, 0, "RotationY", "SliderRotationY"],
+    ["mySliderB5", "sliderValueB5", 0, 100, 50, "Gear Rot:", "SliderGearRot"], 
     ["mySliderB6", "sliderValueB6", 0, 100, 50, "unused", ""]
 ];
 
@@ -86,4 +86,4 @@ function start() {
     animate();
 }
 
-//start();
+start();

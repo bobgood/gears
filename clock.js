@@ -24,8 +24,10 @@ configuration_json = [
     {
         "Type": "Camera",
         "Name": "Camera",
-        "Position": [15, 15, 20],
-        "LookAt": [0, 0, 0]
+        "LookAtX": "neg(SliderPanX)",
+        "LookAtY": "neg(SliderPanY)",
+        "LookAtAngle": "radians(SliderRotationY)",
+        "LookAtZoom": "SliderZoom",
     },
     {
         "Type": "AmbientLight",
@@ -34,7 +36,9 @@ configuration_json = [
     {
         "Type": "DirectionalLight",
         "Name": "DirectionalLight",
-        "Position": [5, 5, 10],
+        "PositionY": "SliderPanY",
+        "PositionX": "rsin(SliderZoom,radians(SliderRotationY)))",
+        "PositionZ": "rcos(SliderZoom,radians(SliderRotationY))",
     },
 
     
